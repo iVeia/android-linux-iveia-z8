@@ -1,0 +1,140 @@
+/*
+ * dts file for Xilinx ZynqMP ZCU102
+ *
+ * (C) Copyright 2015, Xilinx, Inc.
+ *
+ * Michal Simek <michal.simek@xilinx.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ */
+
+/dts-v1/;
+
+/include/ "zynqmp.dtsi"
+/include/ "zynqmp-clk.dtsi"
+/ {
+	model = "ZynqMP ZCU102";
+	compatible = "xlnx,zynqmp-zcu102", "xlnx,zynqmp";
+
+	aliases {
+		ethernet0 = &gem3;
+		gpio0 = &gpio;
+		i2c0 = &i2c0;
+		i2c1 = &i2c1;
+		rtc0 = &rtc;
+		serial0 = &uart0;
+		serial1 = &uart1;
+		spi0 = &qspi;
+		usb0 = &usb0;
+	};
+
+	chosen {
+		bootargs = "console=ttyPS1,115200 earlycon=cdns,mmio,0xff010000,115200n8 loglevel=9 root=/dev/ram rw";
+//		bootargs = "console=ttyPS1,115200 root=/dev/ram rw earlyprintk loglevel=9 initcall_debug";
+		stdout-path = "serial1:115200n8";
+	};
+
+	memory {
+		device_type = "memory";
+		reg = <0x0 0x0 0x80000000>, <0x8 0x00000000 0x80000000>;
+	};
+};
+
+&can1 {
+	status = "okay";
+};
+
+&gem3 {
+	status = "okay";
+	local-mac-address = [00 0a 35 00 02 90];
+	phy-handle = <&phy0>;
+	phy-mode = "rgmii-id";
+	phy0: phy@21 {
+		reg = <21>;
+		ti,rx-internal-delay = <0x8>;
+		ti,tx-internal-delay = <0xa>;
+		ti,fifo-depth = <0x1>;
+	};
+};
+
+&gpio {
+	status = "okay";
+};
+
+&gpu {
+	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+};
+
+&i2c1 {
+	status = "okay";
+	clock-frequency = <400000>;
+};
+
+&pcie {
+	status = "okay";
+};
+
+&qspi {
+	status = "okay";
+};
+
+&rtc {
+	status = "okay";
+};
+
+/* SD1 with level shifter */
+&sdhci1 {
+	status = "okay";
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+/* ULPI SMSC USB3320 */
+&usb0 {
+	status = "okay";
+	dr_mode = "host";
+};
+
+&xlnx_dp {
+	status = "okay";
+};
+
+&xlnx_dp_sub {
+	status = "okay";
+	xlnx,vid-clk-pl;
+};
+
+&xlnx_dp_snd_pcm0 {
+	status = "okay";
+};
+
+&xlnx_dp_snd_pcm1 {
+	status = "okay";
+};
+
+&xlnx_dp_snd_card {
+	status = "okay";
+};
+
+&xlnx_dp_snd_codec0 {
+	status = "okay";
+};
+
+&xlnx_dpdma {
+	status = "okay";
+};

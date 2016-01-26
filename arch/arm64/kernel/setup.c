@@ -375,7 +375,7 @@ void __init setup_arch(char **cmdline_p)
 	 *  Unmask asynchronous aborts after bringing up possible earlycon.
 	 * (Report possible System Errors once we can report this occurred)
 	 */
-	local_async_enable();
+//	local_async_enable();
 
 	efi_init();
 	arm64_memblock_init();
