@@ -32,7 +32,7 @@
 	};
 
 	chosen {
-		bootargs = "console=ttyPS1,115200 earlycon=cdns,mmio,0xff010000,115200n8 loglevel=9 root=/dev/ram rw";
+		bootargs = "console=ttyPS1,115200 earlycon=cdns,mmio,0xff010000,115200n8 loglevel=9";
 //		bootargs = "console=ttyPS1,115200 root=/dev/ram rw earlyprintk loglevel=9 initcall_debug";
 		stdout-path = "serial1:115200n8";
 	};
@@ -93,6 +93,10 @@
 
 /* SD1 with level shifter */
 &sdhci1 {
+	status = "okay";
+};
+
+&sdhci0 {
 	status = "okay";
 };
 

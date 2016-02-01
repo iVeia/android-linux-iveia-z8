@@ -233,6 +233,11 @@ config ARCH_ZYNQMP
 	help
 	  This enables support for Xilinx Zynq MP SOC Family
 
+config ARCH_IV_ATLAS_II_Z8
+	bool "iVeia Atlas-II-Z8 SoM Family"
+	help
+	  This enables support for iVeia Atlas-II-Z8 Family
+
 endmenu
 
 menu "Bus support"
