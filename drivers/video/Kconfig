@@ -52,4 +52,7 @@ if FB || SGI_NEWPORT_CONSOLE
 endif
 
 
+source "drivers/video/Kconfig.iveia"
+
+
 endmenu
