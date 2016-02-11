@@ -1,5 +1,5 @@
 /*
- * dts file for Xilinx ZynqMP ZCU102
+* dts file for Xilinx ZynqMP ZCU102
  *
  * (C) Copyright 2015, Xilinx, Inc.
  *
@@ -115,6 +115,11 @@
 &usb0 {
 	status = "okay";
 	dr_mode = "host";
+};
+
+&usb1 {
+	status = "okay";
+	dr_mode = "otg";
 };
 
 &xlnx_dp {
