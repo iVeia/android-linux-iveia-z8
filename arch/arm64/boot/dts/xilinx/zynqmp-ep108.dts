@@ -13,8 +13,8 @@
 
 /dts-v1/;
 
-/include/ "zynqmp.dtsi"
-/include/ "zynqmp-ep108-clk.dtsi"
+#include "zynqmp.dtsi"
+#include "zynqmp-ep108-clk.dtsi"
 
 / {
 	model = "ZynqMP EP108";
@@ -27,12 +27,13 @@
 	};
 
 	chosen {
+		bootargs = "earlycon";
 		stdout-path = "serial0:115200n8";
 	};
 
 	memory {
 		device_type = "memory";
-		reg = <0x0 0x0 0x40000000>;
+		reg = <0x0 0x0 0x0 0x40000000>;
 	};
 };
 
@@ -148,6 +149,7 @@
 
 &sdhci0 {
 	status = "okay";
+	bus-width = <8>;
 };
 
 &sdhci1 {
