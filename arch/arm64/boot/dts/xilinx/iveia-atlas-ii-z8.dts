@@ -32,8 +32,9 @@
 	};
 
 	chosen {
-		bootargs = "console=ttyPS1,115200 earlycon=cdns,mmio,0xff010000,115200n8 init=/init video=DP-1:1024x768@60 root=/dev/mmcblk0p2 rw rootfstype=ext4 drm.debug=0xf rootwait androidboot.selinux=disabled androidboot.hardware=zcu102 qemu=1";
-//		bootargs = "console=ttyPS1,115200 root=/dev/ram rw earlyprintk loglevel=9 initcall_debug";
+//		bootargs = "console=ttyPS1,115200n8 earlycon=cdns,mmio,0xff010000,115200n8 init=/init video=DP-1:1024x768@60 root=/dev/mmcblk0p2 rw rootfstype=ext4 drm.debug=0xf rootwait androidboot.selinux=disabled androidboot.hardware=zcu102 qemu=1";
+		bootargs = "console=ttyPS1,115200n8 single root=/dev/mmcblk0p3 rw rootfstype=ext4 rootwait rw earlyprintk loglevel=9";
+//		bootargs = "console=ttyPS1,115200n8 rw earlyprintk loglevel=9";
 		stdout-path = "serial1:115200n8";
 	};
 
