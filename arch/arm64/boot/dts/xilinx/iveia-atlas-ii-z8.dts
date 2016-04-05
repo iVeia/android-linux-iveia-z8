@@ -106,11 +106,13 @@
 &sdhci1 {
 	status = "okay";
 	non-removable;
+	broken-mmc-highspeed;
 };
 
 &sdhci0 {
 	status = "okay";
 	non-removable;
+	broken-mmc-highspeed;
 };
 
 &uart0 {
