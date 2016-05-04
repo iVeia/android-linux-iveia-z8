@@ -29,6 +29,7 @@
 		serial1 = &uart1;
 		spi0 = &qspi;
 		usb0 = &usb0;
+		usb1 = &usb1;
 	};
 
 	chosen {
@@ -126,10 +127,19 @@
 /* ULPI SMSC USB3320 */
 &usb0 {
 	status = "okay";
+};
+
+//They are actually both OTG on Z8, but we'll make USBB Host for compatibility with IO Boards
+&dwc3_0 {
+	status = "okay";
 	dr_mode = "host";
 };
 
 &usb1 {
+	status = "okay";
+};
+
+&dwc3_1 {
 	status = "okay";
 	dr_mode = "otg";
 };
