@@ -259,7 +259,7 @@ static int ulite_startup(struct uart_port *port)
 {
 	int ret;
 
-	ret = request_irq(port->irq, ulite_isr, IRQF_SHARED, "uartlite", port);
+	ret = request_irq(port->irq, ulite_isr, IRQF_TRIGGER_RISING, "uartlite", port);
 	if (ret)
 		return ret;
 
@@ -557,8 +557,9 @@ static int __init early_uartlite_setup(struct earlycon_device *device,
 	return 0;
 }
 EARLYCON_DECLARE(uartlite, early_uartlite_setup);
-OF_EARLYCON_DECLARE(uartlite_b, "xlnx,opb-uartlite-1.00.b", early_uartlite_setup);
-OF_EARLYCON_DECLARE(uartlite_a, "xlnx,xps-uartlite-1.00.a", early_uartlite_setup);
+OF_EARLYCON_DECLARE(uartlite_c, "xlnx,opb-uartlite-1.00.b", early_uartlite_setup);
+OF_EARLYCON_DECLARE(uartlite_b, "xlnx,xps-uartlite-1.00.a", early_uartlite_setup);
+OF_EARLYCON_DECLARE(uartlite_a, "xlnx,axi-uartlite-1.02.a", early_uartlite_setup);
 
 #endif /* CONFIG_SERIAL_UARTLITE_CONSOLE */
 
@@ -666,6 +667,7 @@ static int ulite_release(struct device *dev)
 static const struct of_device_id ulite_of_match[] = {
 	{ .compatible = "xlnx,opb-uartlite-1.00.b", },
 	{ .compatible = "xlnx,xps-uartlite-1.00.a", },
+	{ .compatible = "xlnx,axi-uartlite-1.02.a", },
 	{}
 };
 MODULE_DEVICE_TABLE(of, ulite_of_match);
