@@ -494,8 +494,8 @@ static void __init mm_init(void)
 	ioremap_huge_init();
 }
 
-extern volatile unsigned long tx_vaddr;
-extern volatile unsigned long rx_vaddr;
+extern volatile void * tx_vaddr;
+extern volatile void * rx_vaddr;
 
 asmlinkage __visible void __init start_kernel(void)
 {
@@ -537,14 +537,14 @@ asmlinkage __visible void __init start_kernel(void)
 
 	build_all_zonelists(NULL, NULL);
 	page_alloc_init();
-/*
+
 #ifdef CONFIG_ARCH_IV_ATLAS_II_Z8
     #ifdef CONFIG_IVEIA_ZAP
         rx_vaddr = alloc_bootmem_pages(4*1024*1024);
         tx_vaddr = alloc_bootmem_pages(4*1024*1024);
     #endif
 #endif
-*/
+
 	pr_notice("Kernel command line: %s\n", boot_command_line);
 	parse_early_param();
 	after_dashes = parse_args("Booting kernel",
