@@ -1,9 +1,8 @@
 /*
-* dts file for Xilinx ZynqMP ZCU102
+* dts file for iVeia Atlas-II-Z8
  *
- * (C) Copyright 2015, Xilinx, Inc.
  *
- * Michal Simek <michal.simek@xilinx.com>
+ * Patrick Cleary <pcleary@iveia.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -13,8 +12,11 @@
 
 /dts-v1/;
 
-/include/ "zynqmp.dtsi"
-/include/ "zynqmp-clk.dtsi"
+#include "zynqmp.dtsi"
+#include "zynqmp-clk.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/phy/phy.h>
+
 / {
 	model = "ZynqMP ZCU102";
 	compatible = "xlnx,zynqmp-zcu102", "xlnx,zynqmp";
@@ -46,6 +48,10 @@
 
 };
 
+&serdes {
+	status = "okay";
+};
+
 &can1 {
 	status = "okay";
 };
@@ -65,6 +71,14 @@
 	phy-mode = "gmii";
 };
 
+&gem3 {
+	status = "okay";
+	phy-mode = "sgmii";
+	phy-names = "sgmii-phy";
+	phys = <&lane3 PHY_TYPE_SGMII 3 1 125000000>;
+	
+};
+
 &gpio {
 	status = "okay";
 };
@@ -76,6 +90,14 @@
 &i2c0 {
 	status = "okay";
 	clock-frequency = <400000>;
+
+	iv_io_00091_switch@77 {
+                compatible = "nxp,pca9547";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0x77>;
+		
+	};
 
 	tsc@4a {
 		reg = <0x4a>;
@@ -93,6 +115,7 @@
 
 &pcie {
 	status = "okay";
+	phys = <&lane0 PHY_TYPE_PCIE 0 0 100000000>;
 };
 
 &qspi {
@@ -144,31 +167,3 @@
 	dr_mode = "otg";
 };
 
-&xlnx_dp {
-	status = "okay";
-};
-
-&xlnx_dp_sub {
-	status = "okay";
-	xlnx,vid-clk-pl;
-};
-
-&xlnx_dp_snd_pcm0 {
-	status = "okay";
-};
-
-&xlnx_dp_snd_pcm1 {
-	status = "okay";
-};
-
-&xlnx_dp_snd_card {
-	status = "okay";
-};
-
-&xlnx_dp_snd_codec0 {
-	status = "okay";
-};
-
-&xlnx_dpdma {
-	status = "okay";
-};
