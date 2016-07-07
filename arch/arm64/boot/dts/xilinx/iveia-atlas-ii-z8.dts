@@ -56,6 +56,7 @@
 	status = "okay";
 };
 
+
 &gem0 {
 	status = "okay";
 	phy-mode = "gmii";
@@ -71,12 +72,14 @@
 	phy-mode = "gmii";
 };
 
+
 &gem3 {
 	status = "okay";
 	phy-mode = "sgmii";
 	phy-names = "sgmii-phy";
-	phys = <&lane3 PHY_TYPE_SGMII 3 1 125000000>;
-	
+//	phys = <&lane3 PHY_TYPE_SGMII 3 1 125000000>;
+        phy-handle = <&quadratic_phy0>;
+        use-internal-mdio = <0>;	
 };
 
 &gpio {
@@ -96,7 +99,35 @@
                 #address-cells = <1>;
                 #size-cells = <0>;
                 reg = <0x77>;
-		
+	
+		i2c@0 {
+			#address-cells = <1>;
+                        #size-cells = <0>;
+                        reg = <0>;
+	
+			mdio@41 {  //Quadratic Tri-Mode Ethernet PHY
+        		        compatible = "iveia,mdio-bsc-i2c";
+               			 reg = <0x41>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				quadratic_phy0: phy@1 {
+					compatible = "ethernet-phy-ieee802.3-c22";
+					device_type = "ethernet-phy";
+					reg = <1>;
+				};
+           	 	};
+
+                        rtc@68 {
+                                compatible = "stm,m41t62";
+                                reg = <0x68>;
+                        };
+
+                        tempsens@4f {
+                                compatible = "national,lm75";
+                                reg = <0x4f>;
+                        };			
+                };		
 	};
 
 	tsc@4a {
