@@ -20,6 +20,9 @@
 / {
 	model = "ZynqMP ZCU102";
 	compatible = "xlnx,zynqmp-zcu102", "xlnx,zynqmp";
+	#address-cells = <2>;
+	#size-cells = <1>;
+
 
 	aliases {
 		ethernet0 = &gem0;
