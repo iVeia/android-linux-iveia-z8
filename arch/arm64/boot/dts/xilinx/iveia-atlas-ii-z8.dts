@@ -49,6 +49,12 @@
 		reg = <0x0 0x0 0x80000000>, <0x8 0x00000000 0x80000000>;
 	};
 
+
+};
+
+
+&amba {
+
 	iv_io_00091_gem: ethernet@ff0e0000 {
 		compatible = "cdns,zynqmp-gem";
 		status = "okay";
@@ -90,6 +96,7 @@
 	};
 
 };
+
 
 &serdes {
 	status = "okay";
@@ -249,6 +256,10 @@
 &dwc3_0 {
 	status = "okay";
 	dr_mode = "host";
+
+	/* 3.0 only  */ 
+//	phy-names = "usb3-phy";
+//	phys = <&lane0 PHY_TYPE_USB3 0 0 26000000>;
 };
 
 &usb1 {
