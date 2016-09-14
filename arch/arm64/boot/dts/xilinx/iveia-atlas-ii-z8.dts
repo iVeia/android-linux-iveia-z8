@@ -55,7 +55,7 @@
 
 &amba {
 //ETH0
-	default_eth0: NOT_iv_io_00093_ethernet@ff0b0000 {
+	default_eth0: NOT_iv_io_00093_NOT_iv_io_00073_ethernet@ff0b0000 {
 			compatible = "cdns,zynqmp-gem";
 			status = "okay";
 			phy-mode = "gmii";
@@ -71,7 +71,7 @@
             clocks = <&clk125>, <&clk125>, <&clk125>;
 	};
 
-    blackwing_eth0: iv_io_00093_gem@ff0b0000 { //USED FOR ETHERNET_SWITCH_EXAMPLE. MDIO Connected to SGMII CORE
+    blackwing_maveriq_eth0: iv_io_00093_iv_io_00073_gem@ff0b0000 { //USED FOR ETHERNET_SWITCH_EXAMPLE. MDIO Connected to SGMII CORE
 			compatible = "cdns,zynqmp-gem";
 			status = "okay";
 			phy-mode = "gmii";
