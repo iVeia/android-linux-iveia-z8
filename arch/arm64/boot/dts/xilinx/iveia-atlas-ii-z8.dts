@@ -222,6 +222,16 @@
 	status = "okay";
 };
 
+&spi0 {
+	status = "okay";
+
+	iv_io_00093_tpm_spi_tis@0{
+		compatible = "tcg,tpm_spi_tis";
+ 		reg = <0>;	/* CE1 */
+ 		spi-max-frequency = <500000>;
+ 	};
+};
+
 &rtc {
 	status = "okay";
 };
@@ -258,8 +268,8 @@
 	dr_mode = "host";
 
 	/* 3.0 only  */ 
-//	phy-names = "usb3-phy";
-//	phys = <&lane0 PHY_TYPE_USB3 0 0 26000000>;
+	phy-names = "usb3-phy";
+	phys = <&lane0 PHY_TYPE_USB3 0 2 26000000>;
 };
 
 &usb1 {
