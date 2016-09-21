@@ -129,6 +129,24 @@
 		};
 
 // ETH3
+
+	iv_io_00073_gem: iv_io_00073_ethernet@ff0e0000 {
+		compatible = "cdns,zynqmp-gem";
+		status = "okay";
+		interrupt-parent = <&gic>;
+		interrupts = <0 63 4>, <0 63 4>;
+		reg = <0x0 0xff0e0000 0x1000>;
+		clock-names = "pclk", "hclk", "tx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#stream-id-cells = <1>;
+		iommus = <&smmu 0x877>;
+		power-domains = <&pd_eth3>;
+		clocks = <&clk125>, <&clk125>, <&clk125>;
+		phy-mode = "sgmii";
+		phy-names = "sgmii-phy";
+	};
+
 	iv_io_00091_gem: iv_io_00091_ethernet@ff0e0000 {
 		compatible = "cdns,zynqmp-gem";
 		status = "okay";
