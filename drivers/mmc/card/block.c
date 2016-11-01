@@ -2188,9 +2188,21 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
 	struct mmc_blk_data *md;
 	int devidx, ret;
 
-	devidx = find_first_zero_bit(dev_use, max_devices);
-	if (devidx >= max_devices)
+	/*
+	* Attempt to match device load order to block device order.  That is,
+	* device mmc0 should get the minor number for mmcblk0.  If it doesn't
+	* work, default back to first-come-first-served way.
+	*/
+	for (devidx = 0; devidx <= max_devices; devidx++) {
+		char hostname[8];
+		snprintf(hostname, sizeof(hostname), "mmc%d", devidx);
+		if (strcmp(mmc_hostname(card->host), hostname) == 0)
+			break;
+	}
+	if (devidx >= max_devices) {
 		return ERR_PTR(-ENOSPC);
+	}
+
 	__set_bit(devidx, dev_use);
 
 	md = kzalloc(sizeof(struct mmc_blk_data), GFP_KERNEL);
@@ -2205,12 +2217,15 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
 	 * partitions, devidx will not coincide with a per-physical card
 	 * index anymore so we keep track of a name index.
 	 */
+
 	if (!subname) {
 		md->name_idx = find_first_zero_bit(name_use, max_devices);
 		__set_bit(md->name_idx, name_use);
 	} else
 		md->name_idx = ((struct mmc_blk_data *)
 				dev_to_disk(parent)->private_data)->name_idx;
+
+	md->name_idx = devidx;//Required for OE to keep mmcblk Numbers static to physical device
 
 	md->area_type = area_type;
 
