@@ -187,6 +187,32 @@
 	        use-internal-mdio = <0>;	
 	};
 
+	iv_io_00096_gem: iv_io_00096_ethernet@ff0e0000 {
+		compatible = "cdns,zynqmp-gem";
+		status = "okay";
+		interrupt-parent = <&gic>;
+		interrupts = <0 63 4>, <0 63 4>;
+		reg = <0x0 0xff0e0000 0x1000>;
+		clock-names = "pclk", "hclk", "tx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#stream-id-cells = <1>;
+		iommus = <&smmu 0x877>;
+		power-domains = <&pd_eth3>;
+		clocks = <&clk125>, <&clk125>, <&clk125>;
+		phy-mode = "sgmii";
+		phy-names = "sgmii-phy";
+	//	phys = <&lane3 PHY_TYPE_SGMII 3 1 125000000>;
+	        phy-handle = <&rogue_phy0>;
+	        use-internal-mdio = <1>;	
+
+        rogue_phy0: phy@0 {
+            compatible = "ethernet-phy-ieee802.3-c22";
+		    device_type = "ethernet-phy";
+		    reg = <0>;
+	    };
+	};
+
 };
 
 
