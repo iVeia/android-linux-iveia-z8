@@ -137,7 +137,7 @@ static int mdio_bsc_i2c_probe(struct i2c_client *client,
     new_bus->phy_mask = 0;
     new_bus->parent = &client->dev;
 
-    new_bus->irq = pdata->irqs;
+    memcpy(new_bus->irq, pdata->irqs, sizeof(new_bus->irq));
 
 	for (i = 0; i < PHY_MAX_ADDR; i++)
 		if (!new_bus->irq[i])

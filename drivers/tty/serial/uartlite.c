@@ -28,7 +28,7 @@
 #define ULITE_NAME		"ttyUL"
 #define ULITE_MAJOR		204
 #define ULITE_MINOR		187
-#define ULITE_NR_UARTS		4
+#define ULITE_NR_UARTS		16
 
 /* ---------------------------------------------------------------------
  * Register definitions
@@ -193,12 +193,15 @@ static int ulite_transmit(struct uart_port *port, int stat)
 static irqreturn_t ulite_isr(int irq, void *dev_id)
 {
 	struct uart_port *port = dev_id;
-	int busy, n = 0;
+	int stat, busy, n = 0;
+	unsigned long flags;
 
 	do {
-		int stat = uart_in32(ULITE_STATUS, port);
+		spin_lock_irqsave(&port->lock, flags);
+		stat = uart_in32(ULITE_STATUS, port);
 		busy  = ulite_receive(port, stat);
 		busy |= ulite_transmit(port, stat);
+		spin_unlock_irqrestore(&port->lock, flags);
 		n++;
 	} while (busy);
 
@@ -259,7 +262,8 @@ static int ulite_startup(struct uart_port *port)
 {
 	int ret;
 
-	ret = request_irq(port->irq, ulite_isr, IRQF_TRIGGER_RISING, "uartlite", port);
+	ret = request_irq(port->irq, ulite_isr, IRQF_TRIGGER_RISING,
+			  "uartlite", port);
 	if (ret)
 		return ret;
 
@@ -557,9 +561,8 @@ static int __init early_uartlite_setup(struct earlycon_device *device,
 	return 0;
 }
 EARLYCON_DECLARE(uartlite, early_uartlite_setup);
-OF_EARLYCON_DECLARE(uartlite_c, "xlnx,opb-uartlite-1.00.b", early_uartlite_setup);
-OF_EARLYCON_DECLARE(uartlite_b, "xlnx,xps-uartlite-1.00.a", early_uartlite_setup);
-OF_EARLYCON_DECLARE(uartlite_a, "xlnx,axi-uartlite-1.02.a", early_uartlite_setup);
+OF_EARLYCON_DECLARE(uartlite_b, "xlnx,opb-uartlite-1.00.b", early_uartlite_setup);
+OF_EARLYCON_DECLARE(uartlite_a, "xlnx,xps-uartlite-1.00.a", early_uartlite_setup);
 
 #endif /* CONFIG_SERIAL_UARTLITE_CONSOLE */
 
@@ -667,7 +670,6 @@ static int ulite_release(struct device *dev)
 static const struct of_device_id ulite_of_match[] = {
 	{ .compatible = "xlnx,opb-uartlite-1.00.b", },
 	{ .compatible = "xlnx,xps-uartlite-1.00.a", },
-	{ .compatible = "xlnx,axi-uartlite-1.02.a", },
 	{}
 };
 MODULE_DEVICE_TABLE(of, ulite_of_match);
