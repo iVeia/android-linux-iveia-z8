@@ -341,12 +341,14 @@
 	status = "okay";
 	non-removable;
 	broken-mmc-highspeed;
+	xlnx,mio_bank = <0>;
 };
 
 &sdhci0 {
 	status = "okay";
 	non-removable;
 	broken-mmc-highspeed;
+	xlnx,mio_bank = <1>;
 };
 
 &uart0 {
