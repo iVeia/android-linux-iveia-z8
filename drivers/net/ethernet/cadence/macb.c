@@ -3387,7 +3387,32 @@ static int macb_probe(struct platform_device *pdev)
 	void __iomem *mem;
 	const char *mac;
 	struct macb *bp;
+	u32 regval;
+	void *prop;
 	int err;
+        int bUseInternalMdio;
+
+        prop = of_get_property(pdev->dev.of_node,"use-internal-mdio",NULL);
+        if (prop != NULL)
+                regval = be32_to_cpup(prop);
+
+        if (prop == NULL || regval == 1)
+                bUseInternalMdio = 1;
+        else
+                bUseInternalMdio = 0;
+
+        if (!bUseInternalMdio){
+                phy_node = of_parse_phandle(pdev->dev.of_node,"phy-handle", 0);
+                if (phy_node){
+                        phydev = of_phy_find_device(phy_node);
+                        if (!phydev){
+                                dev_err(&pdev->dev, "PHY device not registered yet, deferring probe(%u)\n", err);
+                                return -EPROBE_DEFER;
+                        }
+                }else{
+                        return -ENODEV;
+                }
+        }
 
 	regs = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	mem = devm_ioremap_resource(&pdev->dev, regs);
@@ -3511,9 +3536,30 @@ static int macb_probe(struct platform_device *pdev)
 		goto err_out_unregister_netdev;
 	}
 
-	err = macb_mii_init(bp);
-	if (err)
-		goto err_out_unregister_netdev;
+	if (bUseInternalMdio){
+		err = macb_mii_init(bp);
+		if (err)
+			goto err_out_unregister_netdev;
+    	}else{//Uses external MDIO
+        	//iVeia, JSM
+        	if (phy_node){
+            		bp->phy_dev = of_phy_find_device(phy_node);
+            		bp->mii_bus = bp->phy_dev->mdio.bus;
+            		if (bp->phy_dev){
+                		dev_set_drvdata(&bp->dev->dev, bp->mii_bus);//NOT SURE IF THIS IS NEEDED
+                		err = macb_mii_probe(bp->dev);
+                		if (err) {
+                    			dev_err(&pdev->dev, "Cannot register net device, aborting.\n");
+                    			goto err_out_free_netdev;
+                		}
+            		}else{
+                		dev_err(&pdev->dev, "use-internal-mdio = 0, PHY Dev Not Found (Shouldn't happen).\n");
+            		}
+        	}else{
+            		dev_err(&pdev->dev, "use-internal-mdio = 0, PHY Node Not Found (Shouldn't happen).\n");
+        	}
+        //END iVeia, JSM
+    	}
 
 	netif_carrier_off(dev);
 
