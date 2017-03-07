@@ -61,7 +61,7 @@
 			phy-mode = "gmii";
 			interrupt-parent = <&gic>;
 			interrupts = <0 57 4>, <0 57 4>;
-			reg = <0x0 0xff0b0000 0x1000>;
+			reg = <0x0 0xff0b0000 0x0 0x1000>;
 			clock-names = "pclk", "hclk", "tx_clk";
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -77,7 +77,7 @@
 			phy-mode = "gmii";
 			interrupt-parent = <&gic>;
 			interrupts = <0 57 4>, <0 57 4>;
-			reg = <0x0 0xff0b0000 0x1000>;
+			reg = <0x0 0xff0b0000 0x0 0x1000>;
 			clock-names = "pclk", "hclk", "tx_clk";
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -98,10 +98,10 @@
 		iv_gem1: iv_ethernet@ff0c0000 {
 			compatible = "cdns,zynqmp-gem";
 			status = "okay";
-            phy-mode = "gmii";
+	                phy-mode = "gmii";
 			interrupt-parent = <&gic>;
 			interrupts = <0 59 4>, <0 59 4>;
-			reg = <0x0 0xff0c0000 0x1000>;
+			reg = <0x0 0xff0c0000 0x0 0x1000>;
 			clock-names = "pclk", "hclk", "tx_clk";
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -118,7 +118,7 @@
             phy-mode = "gmii";
 			interrupt-parent = <&gic>;
 			interrupts = <0 61 4>, <0 61 4>;
-			reg = <0x0 0xff0d0000 0x1000>;
+			reg = <0x0 0xff0d0000 0x0 0x1000>;
 			clock-names = "pclk", "hclk", "tx_clk";
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -135,7 +135,7 @@
 		status = "okay";
 		interrupt-parent = <&gic>;
 		interrupts = <0 63 4>, <0 63 4>;
-		reg = <0x0 0xff0e0000 0x1000>;
+		reg = <0x0 0xff0e0000 0x0 0x1000>;
 		clock-names = "pclk", "hclk", "tx_clk";
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -152,7 +152,7 @@
 		status = "okay";
 		interrupt-parent = <&gic>;
 		interrupts = <0 63 4>, <0 63 4>;
-		reg = <0x0 0xff0e0000 0x1000>;
+		reg = <0x0 0xff0e0000 0x0 0x1000>;
 		clock-names = "pclk", "hclk", "tx_clk";
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -172,7 +172,7 @@
 		status = "okay";
 		interrupt-parent = <&gic>;
 		interrupts = <0 63 4>, <0 63 4>;
-		reg = <0x0 0xff0e0000 0x1000>;
+		reg = <0x0 0xff0e0000 0x0 0x1000>;
 		clock-names = "pclk", "hclk", "tx_clk";
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -192,7 +192,7 @@
 		status = "okay";
 		interrupt-parent = <&gic>;
 		interrupts = <0 63 4>, <0 63 4>;
-		reg = <0x0 0xff0e0000 0x1000>;
+		reg = <0x0 0xff0e0000 0x0 0x1000>;
 		clock-names = "pclk", "hclk", "tx_clk";
 		#address-cells = <1>;
 		#size-cells = <0>;
