@@ -213,6 +213,34 @@
 	    };
 	};
 
+	iv_io_00095_gem: iv_io_00095_ethernet@ff0e0000 {
+		compatible = "cdns,zynqmp-gem";
+		status = "okay";
+		interrupt-parent = <&gic>;
+		interrupts = <0 63 4>, <0 63 4>;
+		reg = <0x0 0xff0e0000 0x0 0x1000>;
+		clock-names = "pclk", "hclk", "tx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#stream-id-cells = <1>;
+		iommus = <&smmu 0x877>;
+		power-domains = <&pd_eth3>;
+		clocks = <&clk125>, <&clk125>, <&clk125>;
+		phy-mode = "sgmii";
+		phy-names = "sgmii-phy";
+	//	phys = <&lane3 PHY_TYPE_SGMII 3 1 125000000>;
+	        phy-handle = <&vpx1_phy0>;
+	        use-internal-mdio = <1>;	
+
+        vpx1_phy0: phy@0 {
+            compatible = "ethernet-phy-ieee802.3-c22";
+		    device_type = "ethernet-phy";
+		    reg = <0>;
+	    };
+	};
+
+
+
 };
 
 
@@ -299,11 +327,50 @@
                 };		
 	};
 
-	tsc@4a {
-		reg = <0x4a>;
-		compatible = "atmel,maxtouch";
-		interrupt-parent = <&gic>;
-		interrupts = <0 89 4>;
+	iv_io_00095_switch@77 {
+                compatible = "nxp,pca9547";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0x77>;
+	
+		i2c@0 {
+			#address-cells = <1>;
+                        #size-cells = <0>;
+                        reg = <0>;
+	
+                        rtc@68 {
+                                compatible = "stm,m41t62";
+                                reg = <0x68>;
+                        };
+
+                        tempsens@4f {
+                                compatible = "national,lm75";
+                                reg = <0x4f>;
+                        };			
+                };		
+	};
+
+	iv_io_00100_switch@77 {
+                compatible = "nxp,pca9547";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0x77>;
+	
+		i2c@0 {
+			#address-cells = <1>;
+                        #size-cells = <0>;
+                        reg = <0>;
+	
+                        rtc@68 {
+                                compatible = "stm,m41t62";
+                                reg = <0x68>;
+                        };
+
+                        tempsens@4f {
+                                compatible = "national,lm75";
+                                reg = <0x4f>;
+                        };			
+                };		
 	};
 
 };
