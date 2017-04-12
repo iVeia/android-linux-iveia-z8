@@ -183,7 +183,7 @@ static void mali_mem_swap_out_page_node(mali_page_node *page_node)
 	dma_unmap_page(&mali_platform_device->dev, page_node->swap_it->dma_addr,
 		       _MALI_OSK_MALI_PAGE_SIZE, DMA_TO_DEVICE);
 	set_page_dirty(page_node->swap_it->page);
-	page_cache_release(page_node->swap_it->page);
+	put_page(page_node->swap_it->page);
 }
 
 void mali_mem_swap_unlock_single_mem_backend(mali_mem_backend *mem_bkend)
