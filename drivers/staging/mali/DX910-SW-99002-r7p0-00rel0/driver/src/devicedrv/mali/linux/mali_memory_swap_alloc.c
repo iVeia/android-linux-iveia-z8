@@ -52,7 +52,7 @@ extern struct mali_mem_os_allocator mali_mem_os_allocator;
 #define MALI_SWAP_LOW_MEM_DEFAULT_VALUE (60*1024*1024)
 #define MALI_SWAP_INVALIDATE_MALI_ADDRESS (0)               /* Used to mark the given memory cookie is invalidate. */
 #define MALI_SWAP_GLOBAL_SWAP_FILE_SIZE (0xFFFFFFFF)
-#define MALI_SWAP_GLOBAL_SWAP_FILE_INDEX ((MALI_SWAP_GLOBAL_SWAP_FILE_SIZE) >> PAGE_CACHE_SHIFT)
+#define MALI_SWAP_GLOBAL_SWAP_FILE_INDEX ((MALI_SWAP_GLOBAL_SWAP_FILE_SIZE) >> PAGE_SHIFT)
 #define MALI_SWAP_GLOBAL_SWAP_FILE_INDEX_RESERVE (1 << 15) /* Reserved for CoW nonlinear swap backend memory, the space size is 128MB. */
 
 unsigned int mali_mem_swap_out_threshold_value = MALI_SWAP_LOW_MEM_DEFAULT_VALUE;
