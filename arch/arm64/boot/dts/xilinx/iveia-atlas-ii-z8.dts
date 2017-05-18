@@ -13,7 +13,7 @@
 /dts-v1/;
 
 #include "zynqmp.dtsi"
-#include "zynqmp-clk.dtsi"
+#include "zynqmp-clk-ccf.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/phy/phy.h>
 
@@ -62,71 +62,71 @@
 			interrupt-parent = <&gic>;
 			interrupts = <0 57 4>, <0 57 4>;
 			reg = <0x0 0xff0b0000 0x0 0x1000>;
-			clock-names = "pclk", "hclk", "tx_clk";
+			clocks = <&clkc 45>, <&clkc 45>, <&clkc 49>;
+			clock-names = "pclk", "tx_clk", "hclk";
 			#address-cells = <1>;
 			#size-cells = <0>;
 			#stream-id-cells = <1>;
 			iommus = <&smmu 0x874>;
 			power-domains = <&pd_eth0>;
-            clocks = <&clk125>, <&clk125>, <&clk125>;
 	};
 
-    blackwing_maveriq_eth0: iv_io_00093_iv_io_00073_gem@ff0b0000 { //USED FOR ETHERNET_SWITCH_EXAMPLE. MDIO Connected to SGMII CORE
+	blackwing_maveriq_eth0: iv_io_00093_iv_io_00073_gem@ff0b0000 { //USED FOR ETHERNET_SWITCH_EXAMPLE. MDIO Connected to SGMII CORE
 			compatible = "cdns,zynqmp-gem";
 			status = "okay";
 			phy-mode = "gmii";
 			interrupt-parent = <&gic>;
 			interrupts = <0 57 4>, <0 57 4>;
 			reg = <0x0 0xff0b0000 0x0 0x1000>;
-			clock-names = "pclk", "hclk", "tx_clk";
+			clocks = <&clkc 45>, <&clkc 45>, <&clkc 49>;
+			clock-names = "pclk", "tx_clk", "hclk";
 			#address-cells = <1>;
 			#size-cells = <0>;
 			#stream-id-cells = <1>;
 			iommus = <&smmu 0x874>;
 			power-domains = <&pd_eth0>;
-            clocks = <&clk125>, <&clk125>, <&clk125>;
-	    	phy-handle = <&blackwing_dummy_phy>;
-	    	blackwing_dummy_phy: phy@1 {
-		    	compatible = "Xilinx PCS/PMA PHY";
-		    	device_type = "ethernet-phy";
-		    	xlnx,phy-type = <5>;
-		    	reg = <1>;
-	    	};
-    };
+	    		phy-handle = <&blackwing_dummy_phy>;
+	    		blackwing_dummy_phy: phy@1 {
+		    		compatible = "Xilinx PCS/PMA PHY";
+		    		device_type = "ethernet-phy";
+		    		xlnx,phy-type = <5>;
+		    		reg = <1>;
+		    	};
+    	};
 
 // ETH1
-		iv_gem1: iv_ethernet@ff0c0000 {
-			compatible = "cdns,zynqmp-gem";
-			status = "okay";
-	                phy-mode = "gmii";
-			interrupt-parent = <&gic>;
-			interrupts = <0 59 4>, <0 59 4>;
-			reg = <0x0 0xff0c0000 0x0 0x1000>;
-			clock-names = "pclk", "hclk", "tx_clk";
-			#address-cells = <1>;
-			#size-cells = <0>;
-			#stream-id-cells = <1>;
-			iommus = <&smmu 0x875>;
-			power-domains = <&pd_eth1>;
-            clocks = <&clk125>, <&clk125>, <&clk125>;
-		};
+	iv_gem1: iv_ethernet@ff0c0000 {
+		compatible = "cdns,zynqmp-gem";
+		status = "okay";
+                phy-mode = "gmii";
+		interrupt-parent = <&gic>;
+		interrupts = <0 59 4>, <0 59 4>;
+		reg = <0x0 0xff0c0000 0x0 0x1000>;
+		clocks = <&clkc 46>, <&clkc 46>, <&clkc 50>;
+		clock-names = "pclk", "tx_clk", "hclk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#stream-id-cells = <1>;
+		iommus = <&smmu 0x875>;
+		power-domains = <&pd_eth1>;
+	};
 
 // ETH2
-		iv_gem2: iv_ethernet@ff0d0000 {
-			compatible = "cdns,zynqmp-gem";
-			status = "okay";
-            phy-mode = "gmii";
-			interrupt-parent = <&gic>;
-			interrupts = <0 61 4>, <0 61 4>;
-			reg = <0x0 0xff0d0000 0x0 0x1000>;
-			clock-names = "pclk", "hclk", "tx_clk";
-			#address-cells = <1>;
-			#size-cells = <0>;
-			#stream-id-cells = <1>;
-			iommus = <&smmu 0x876>;
-			power-domains = <&pd_eth2>;
-            clocks = <&clk125>, <&clk125>, <&clk125>;
-		};
+	iv_gem2: iv_ethernet@ff0d0000 {
+		compatible = "cdns,zynqmp-gem";
+		status = "okay";
+       		phy-mode = "gmii";
+		interrupt-parent = <&gic>;
+		interrupts = <0 61 4>, <0 61 4>;
+		reg = <0x0 0xff0d0000 0x0 0x1000>;
+		clocks = <&clkc 47>, <&clkc 47>, <&clkc 51>;
+		clock-names = "pclk", "tx_clk", "hclk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#stream-id-cells = <1>;
+		iommus = <&smmu 0x876>;
+		power-domains = <&pd_eth2>;
+	};
 
 // ETH3
 
@@ -136,13 +136,13 @@
 		interrupt-parent = <&gic>;
 		interrupts = <0 63 4>, <0 63 4>;
 		reg = <0x0 0xff0e0000 0x0 0x1000>;
-		clock-names = "pclk", "hclk", "tx_clk";
+		clocks = <&clkc 31>, <&clkc 52>, <&clkc 48>, <&clkc 52>;
+		clock-names = "pclk", "hclk", "tx_clk", "rx_clk";
 		#address-cells = <1>;
 		#size-cells = <0>;
 		#stream-id-cells = <1>;
 		iommus = <&smmu 0x877>;
 		power-domains = <&pd_eth3>;
-		clocks = <&clk125>, <&clk125>, <&clk125>;
 		phy-mode = "sgmii";
 		phy-names = "sgmii-phy";
 	};
@@ -153,16 +153,15 @@
 		interrupt-parent = <&gic>;
 		interrupts = <0 63 4>, <0 63 4>;
 		reg = <0x0 0xff0e0000 0x0 0x1000>;
-		clock-names = "pclk", "hclk", "tx_clk";
+		clocks = <&clkc 31>, <&clkc 52>, <&clkc 48>, <&clkc 52>;
+		clock-names = "pclk", "hclk", "tx_clk", "rx_clk";
 		#address-cells = <1>;
 		#size-cells = <0>;
 		#stream-id-cells = <1>;
 		iommus = <&smmu 0x877>;
 		power-domains = <&pd_eth3>;
-		clocks = <&clk125>, <&clk125>, <&clk125>;
 		phy-mode = "sgmii";
 		phy-names = "sgmii-phy";
-	//	phys = <&lane3 PHY_TYPE_SGMII 3 1 125000000>;
 	        phy-handle = <&quadratic_phy0>;
 	        use-internal-mdio = <0>;	
 	};
@@ -173,16 +172,15 @@
 		interrupt-parent = <&gic>;
 		interrupts = <0 63 4>, <0 63 4>;
 		reg = <0x0 0xff0e0000 0x0 0x1000>;
-		clock-names = "pclk", "hclk", "tx_clk";
+		clocks = <&clkc 31>, <&clkc 52>, <&clkc 48>, <&clkc 52>;
+		clock-names = "pclk", "hclk", "tx_clk", "rx_clk";
 		#address-cells = <1>;
 		#size-cells = <0>;
 		#stream-id-cells = <1>;
 		iommus = <&smmu 0x877>;
 		power-domains = <&pd_eth3>;
-		clocks = <&clk125>, <&clk125>, <&clk125>;
 		phy-mode = "sgmii";
 		phy-names = "sgmii-phy";
-	//	phys = <&lane3 PHY_TYPE_SGMII 3 1 125000000>;
 	        phy-handle = <&blackwing_phy0>;
 	        use-internal-mdio = <0>;	
 	};
@@ -193,16 +191,15 @@
 		interrupt-parent = <&gic>;
 		interrupts = <0 63 4>, <0 63 4>;
 		reg = <0x0 0xff0e0000 0x0 0x1000>;
-		clock-names = "pclk", "hclk", "tx_clk";
+		clocks = <&clkc 31>, <&clkc 52>, <&clkc 48>, <&clkc 52>;
+		clock-names = "pclk", "hclk", "tx_clk", "rx_clk";
 		#address-cells = <1>;
 		#size-cells = <0>;
 		#stream-id-cells = <1>;
 		iommus = <&smmu 0x877>;
 		power-domains = <&pd_eth3>;
-		clocks = <&clk125>, <&clk125>, <&clk125>;
 		phy-mode = "sgmii";
 		phy-names = "sgmii-phy";
-	//	phys = <&lane3 PHY_TYPE_SGMII 3 1 125000000>;
 	        phy-handle = <&rogue_phy0>;
 	        use-internal-mdio = <1>;	
 
@@ -215,6 +212,10 @@
 
 };
 
+
+&pss_ref_clk {
+        clock-frequency = <50000000>;
+};
 
 &serdes {
 	status = "okay";
@@ -299,13 +300,13 @@
                 };		
 	};
 
-	tsc@4a {
+/*	tsc@4a {
 		reg = <0x4a>;
 		compatible = "atmel,maxtouch";
 		interrupt-parent = <&gic>;
 		interrupts = <0 89 4>;
 	};
-
+*/
 };
 
 &i2c1 {
@@ -339,15 +340,13 @@
 /* SD1 with level shifter */
 &sdhci1 {
 	status = "okay";
-	non-removable;
-	broken-mmc-highspeed;
+	no-1-8-v;
 	xlnx,mio_bank = <0>;
 };
 
 &sdhci0 {
 	status = "okay";
-	non-removable;
-	broken-mmc-highspeed;
+	no-1-8-v;
 	xlnx,mio_bank = <1>;
 };
 
