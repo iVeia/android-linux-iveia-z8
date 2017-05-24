@@ -552,7 +552,8 @@ static int macb_mii_init(struct macb *bp)
 				struct phy_device *phydev;
 
 				phydev = mdiobus_scan(bp->mii_bus, i);
-				if (IS_ERR(phydev)) {
+				if (IS_ERR(phydev) &&
+				    PTR_ERR(phydev) != -ENODEV) {
 					err = PTR_ERR(phydev);
 					break;
 				}
@@ -3677,6 +3678,7 @@ static int macb_probe(struct platform_device *pdev)
 	}
 
 	if (bUseInternalMdio){
+
 		err = macb_mii_init(bp);
 		if (err)
 			goto err_out_unregister_netdev;
