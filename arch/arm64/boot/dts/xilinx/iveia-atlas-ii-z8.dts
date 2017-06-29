@@ -357,13 +357,13 @@
 &sdhci1 {
 	status = "okay";
 	no-1-8-v;
-	xlnx,mio_bank = <0>;
+	xlnx,mio_bank = <1>;
 };
 
 &sdhci0 {
 	status = "okay";
 	no-1-8-v;
-	xlnx,mio_bank = <1>;
+	xlnx,mio_bank = <0>;
 };
 
 &uart0 {
