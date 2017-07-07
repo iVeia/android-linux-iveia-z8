@@ -365,7 +365,7 @@ dma_isr(
 			}
 
 #ifdef MAPIT
-			dma_unmap_single( NULL, paddr, (size_t)len, DMA_FROM_DEVICE );
+			//dma_unmap_single(pdma_if->zap_dev->zap_device, paddr, (size_t)len, DMA_FROM_DEVICE );
 #else
 			//dma_unmap_single( NULL, paddr, len, DMA_FROM_DEVICE );
 #endif

@@ -362,6 +362,14 @@ int zap_release(struct inode *inode, struct file *filp)
 	return 0;
 }
 
+//This was added because Z8 was getting kernel panics on dma_map_single(NULL..)
+//http://stackoverflow.com/questions/19952968/dma-map-single-minimum-requirements-to-struct-device
+static struct device zap_device = {
+    .init_name = "zap_device",
+    .coherent_dma_mask = ~0,             // dma_alloc_coherent(): allow any address
+    .dma_mask = &zap_device.coherent_dma_mask,  // other APIs: use the same mask as coherent
+    };
+
 /*
  * Data management: read and write
  */
@@ -395,6 +403,12 @@ ssize_t zap_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
 			retval = pool_deqbuf( &dev->interface[iDevice].rx_pool, &pbuf, &len, &ooblen, &flags );
 			if ( retval ) return retval;
 		}
+
+#ifdef MAPIT
+        dma_map_single(&zap_device, (void *)pbuf, (size_t)len, DMA_FROM_DEVICE );
+        dma_unmap_single(&zap_device, pbuf, (size_t)len, DMA_FROM_DEVICE );
+#endif
+
 	}
 
 	read_data[0] = pool_pbuf2offset(
@@ -409,15 +423,6 @@ ssize_t zap_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
 
 	return count;
 }
-
-//This was added because Z8 was getting kernel panics on dma_map_single(NULL..)
-//http://stackoverflow.com/questions/19952968/dma-map-single-minimum-requirements-to-struct-device
-static struct device zap_device = {
-    .init_name = "zap_device",
-    .coherent_dma_mask = ~0,             // dma_alloc_coherent(): allow any address
-    .dma_mask = &zap_device.coherent_dma_mask,  // other APIs: use the same mask as coherent
-    };
-
 ssize_t zap_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos)
 {
 	struct zap_dev * dev = filp->private_data;
@@ -462,6 +467,7 @@ ssize_t zap_write(struct file *filp, const char __user *buf, size_t count, loff_
 
 #ifdef MAPIT
             dma_addr = dma_map_single(&zap_device,pbuf,len,DMA_TO_DEVICE);
+            dma_unmap_single(&zap_device, dma_addr, len, DMA_TO_DEVICE);
 #endif
 
 			err = pool_enqbuf( &dev->interface[iDevice].tx_pool, pbuf, len, ooblen, 0 );
@@ -472,9 +478,6 @@ ssize_t zap_write(struct file *filp, const char __user *buf, size_t count, loff_
 			dma_ll_tx_write_buf(iDevice);
     #endif
 
-#ifdef MAPIT
-            dma_unmap_single(&zap_device, dma_addr, len, DMA_TO_DEVICE);
-#endif
 		}
 		if ( err ) return err;
 	} else {
@@ -899,6 +902,8 @@ int zap_init_module(void)
 		printk(KERN_ERR "ZAP DMA init error %d\n", err);
 		goto fail;
 	}
+
+	arch_setup_dma_ops(zap_devp->zap_device, 0, 0, NULL,false);
 
 	return 0;
 
