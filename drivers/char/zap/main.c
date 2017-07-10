@@ -384,6 +384,10 @@ ssize_t zap_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
 	unsigned long read_data[4];
     int iDevice;
 
+#ifdef MAPIT
+    dma_addr_t dma_addr;
+#endif
+
 	if (count != sizeof(read_data)) return -EINVAL;
 	if (!access_ok(VERIFY_WRITE, (void __user *)buf, count)) return -EFAULT;
 
@@ -405,8 +409,8 @@ ssize_t zap_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
 		}
 
 #ifdef MAPIT
-        dma_map_single(&zap_device, (void *)pbuf, (size_t)len, DMA_FROM_DEVICE );
-        dma_unmap_single(&zap_device, pbuf, (size_t)len, DMA_FROM_DEVICE );
+        dma_addr = dma_map_single(&zap_device, (void *)pbuf, (size_t)len, DMA_FROM_DEVICE );
+        dma_unmap_single(&zap_device, dma_addr, (size_t)len, DMA_FROM_DEVICE );
 #endif
 
 	}
