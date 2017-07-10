@@ -903,7 +903,7 @@ int zap_init_module(void)
 		goto fail;
 	}
 
-	arch_setup_dma_ops(zap_devp->zap_device, 0, 0, NULL,false);
+	arch_setup_dma_ops(&zap_device, 0, 0, NULL,false);
 
 	return 0;
 
