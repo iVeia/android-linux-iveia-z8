@@ -85,7 +85,7 @@ int dwc3_ulpi_init(struct dwc3 *dwc)
 void dwc3_ulpi_exit(struct dwc3 *dwc)
 {
 	if (dwc->ulpi) {
-		ulpi_unregister_interface(dwc->ulpi);
+	//	ulpi_unregister_interface(dwc->ulpi);
 		dwc->ulpi = NULL;
 	}
 }
