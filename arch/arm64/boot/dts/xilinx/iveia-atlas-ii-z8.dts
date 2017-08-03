@@ -33,8 +33,8 @@
 		serial0 = &uart0;
 		serial1 = &uart1;
 		spi0 = &qspi;
-		usb0 = &usb0;
-		usb1 = &usb1;
+		//usb0 = &usb0;
+		//usb1 = &iv_usb1;
 	};
 
 	chosen {
@@ -262,6 +262,68 @@
         };
         };
 
+		iv_mb_00090_iv_mb_0098_usb0: iv_mb_00090_iv_mb_0098_usb0 { //All boards except Atlas-III-Z8
+		//iv_usb0: iv_usb0 {
+			#address-cells = <2>;
+			#size-cells = <2>;
+			status = "okay";
+			compatible = "xlnx,zynqmp-dwc3";
+			reg = <0x0 0xff9d0000 0x0 0x100>;
+			clock-names = "bus_clk", "ref_clk";
+			#stream-id-cells = <1>;
+			iommus = <&smmu 0x860>;
+			power-domains = <&pd_usb0>;
+			ranges;
+			nvmem-cells = <&soc_revision>;
+			nvmem-cell-names = "soc_revision";
+            clocks = <&clkc 32>,  <&clkc 34>;
+
+			iv_dwc3_0: iv_dwc3@fe200000 {
+				compatible = "snps,dwc3";
+				status = "okay";
+				reg = <0x0 0xfe200000 0x0 0x40000>;
+				interrupt-parent = <&gic>;
+				interrupts = <0 65 4>, <0 69 4>;
+				snps,quirk-frame-length-adjustment = <0x20>;
+				snps,refclk_fladj;
+
+	            dr_mode = "host";
+	            snps,usb3_lpm_capable;
+	            phy-names = "usb3-phy";
+	            phys = <&lane0 PHY_TYPE_USB3 0 2 26000000>;
+
+			};
+		};
+
+		iv_mb_00090_iv_mb_0098_usb1: iv_mb_00090_iv_mb_0098_usb1 { //All boards except Atlas-III-Z8
+			#address-cells = <2>;
+			#size-cells = <2>;
+			status = "okay";
+			compatible = "xlnx,zynqmp-dwc3";
+			reg = <0x0 0xff9e0000 0x0 0x100>;
+			clock-names = "bus_clk", "ref_clk";
+			#stream-id-cells = <1>;
+			iommus = <&smmu 0x861>;
+			power-domains = <&pd_usb1>;
+			ranges;
+			nvmem-cells = <&soc_revision>;
+			nvmem-cell-names = "soc_revision";
+            clocks = <&clkc 33>,  <&clkc 34>;
+
+			iv_dwc3_1: dwc3@fe300000 {
+				compatible = "snps,dwc3";
+				status = "okay";
+				reg = <0x0 0xfe300000 0x0 0x40000>;
+				interrupt-parent = <&gic>;
+				interrupts = <0 70 4>, <0 74 4>;
+				snps,quirk-frame-length-adjustment = <0x20>;
+				snps,refclk_fladj;
+
+                dr_mode = "peripheral";
+
+			};
+		};
+
 };
 
 
@@ -426,26 +488,4 @@
 	status = "okay";
 };
 
-/* ULPI SMSC USB3320 */
-&usb0 {
-	status = "okay";
-};
-
-//They are actually both OTG on Z8, but we'll make USBB Host for compatibility with IO Boards
-&dwc3_0 {
-	status = "okay";
-	dr_mode = "host";
-	snps,usb3_lpm_capable;
-	phy-names = "usb3-phy";
-	phys = <&lane0 PHY_TYPE_USB3 0 2 26000000>;
-};
-
-&usb1 {
-	status = "okay";
-};
-
-&dwc3_1 {
-	status = "okay";
-	dr_mode = "otg";
-};
 
