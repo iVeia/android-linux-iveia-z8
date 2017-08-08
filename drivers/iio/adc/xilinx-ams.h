@@ -97,7 +97,7 @@
 #define AMS_PS_CSTS_PS_READY       0x08010000U
 #define AMS_PL_CSTS_ACCESS_MASK    0x00000001U
 
-#define AMS_PL_MAX_FIXED_CHANNEL   10
+#define AMS_PL_MAX_FIXED_CHANNEL   11
 #define AMS_PL_MAX_EXT_CHANNEL     20
 
 /* Following scale and offset value is derivef from
