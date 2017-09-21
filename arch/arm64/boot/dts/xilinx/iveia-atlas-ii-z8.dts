@@ -481,13 +481,13 @@
 	status = "okay";
 
 	iv_io_00093_tpm_spi_tis@0{
-		compatible = "tcg,tpm_spi_tis";
+		compatible = "tcg,tpm_tis-spi";
  		reg = <0>;	/* CE0 */
  		spi-max-frequency = <500000>;
  	};
 
 	iv_io_00100_tpm_spi_tis@0{
-		compatible = "tcg,tpm_spi_tis";
+		compatible = "tcg,tpm_tis-spi";
  		reg = <0>;	/* CE0 */
  		spi-max-frequency = <500000>;
  	};

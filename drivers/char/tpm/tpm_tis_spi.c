@@ -93,7 +93,7 @@ static int tpm_tis_spi_read_bytes(struct tpm_tis_data *data, u32 addr,
 	 * present, a pull-up on MISO means that the SB controller sees a 1,
 	 * and will latch in 0xFF on the read.
 	 */
-	for (i = 0; (phy->rx_buf[0] & 0x01) == 0 && i < TPM_RETRY; i++) {
+/*	for (i = 0; (phy->rx_buf[0] & 0x01) == 0 && i < TPM_RETRY; i++) {
 		spi_xfer.len = 1;
 		spi_message_init(&m);
 		spi_message_add_tail(&spi_xfer, &m);
@@ -101,7 +101,7 @@ static int tpm_tis_spi_read_bytes(struct tpm_tis_data *data, u32 addr,
 		if (ret < 0)
 			goto exit;
 	}
-
+*/
 	spi_xfer.cs_change = 0;
 	spi_xfer.len = len;
 	spi_xfer.rx_buf = result;
@@ -151,7 +151,7 @@ static int tpm_tis_spi_write_bytes(struct tpm_tis_data *data, u32 addr,
 	 * present, a pull-up on MISO means that the SB controller sees a 1,
 	 * and will latch in 0xFF on the read.
 	 */
-	for (i = 0; (phy->rx_buf[0] & 0x01) == 0 && i < TPM_RETRY; i++) {
+/*	for (i = 0; (phy->rx_buf[0] & 0x01) == 0 && i < TPM_RETRY; i++) {
 		spi_xfer.len = 1;
 		spi_message_init(&m);
 		spi_message_add_tail(&spi_xfer, &m);
@@ -159,7 +159,7 @@ static int tpm_tis_spi_write_bytes(struct tpm_tis_data *data, u32 addr,
 		if (ret < 0)
 			goto exit;
 	}
-
+*/
 	spi_xfer.len = len;
 	spi_xfer.tx_buf = value;
 	spi_xfer.cs_change = 0;
