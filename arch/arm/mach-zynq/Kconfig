@@ -31,4 +31,6 @@ config XILINX_PREFETCH
 
 endmenu
 
+source "arch/arm/mach-zynq/Kconfig.iveia"
+
 endif
