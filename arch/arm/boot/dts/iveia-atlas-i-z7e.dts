@@ -39,10 +39,21 @@
 	iveia_fb {
 		compatible = "iveia,fb";
 	};
-
-	usb_phy0: phy0 {
-		compatible = "usb-nop-xceiv";
+	
+	usb_phy0: phy0@e0002000 {
+		compatible = "ulpi-phy";
 		#phy-cells = <0>;
+		reg = <0xe0002000 0x1000>;
+		view-port = <0x0170>;
+		drv-vbus;
+	};
+
+	usb_phy1: phy0@e0003000 {
+		compatible = "ulpi-phy";
+		#phy-cells = <0>;
+		reg = <0xe0003000 0x1000>;
+		view-port = <0x0170>;
+		drv-vbus;
 	};
 
 };
@@ -244,12 +255,11 @@
 &usb0 {
 	status = "okay";
 	dr_mode = "otg";
-	phy-type = "ulpi";
 	usb-phy = <&usb_phy0>;
 };
 
 &usb1 {
 	status = "okay";
 	dr_mode = "host";
-	phy-type = "ulpi";
+	usb-phy = <&usb_phy1>;
 };
