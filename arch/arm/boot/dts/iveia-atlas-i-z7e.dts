@@ -247,11 +247,11 @@
 	status = "okay";
 };
 
-/*&uart0 {
+&uart0 {
 	u-boot,dm-pre-reloc;
 	status = "okay";
 };
-*/
+
 &usb0 {
 	status = "okay";
 	dr_mode = "otg";
