@@ -147,6 +147,25 @@
 		phy-names = "sgmii-phy";
 	};
 
+	iv_io_00087_gem: iv_io_00087_ethernet@ff0e0000 {
+		compatible = "cdns,zynqmp-gem";
+		status = "okay";
+		interrupt-parent = <&gic>;
+		interrupts = <0 63 4>, <0 63 4>;
+		reg = <0x0 0xff0e0000 0x0 0x1000>;
+		clocks = <&clkc 31>, <&clkc 52>, <&clkc 48>, <&clkc 52>;
+		clock-names = "pclk", "hclk", "tx_clk", "rx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#stream-id-cells = <1>;
+		iommus = <&smmu 0x877>;
+		power-domains = <&pd_eth3>;
+		phy-mode = "sgmii";
+		phy-names = "sgmii-phy";
+	        phy-handle = <&sierra_phy0>;
+	        use-internal-mdio = <0>;	
+	};
+
 	iv_io_00091_gem: iv_io_00091_ethernet@ff0e0000 {
 		compatible = "cdns,zynqmp-gem";
 		status = "okay";
@@ -367,6 +386,19 @@
 &i2c0 {
 	status = "okay";
 	clock-frequency = <400000>;
+
+    iv_io_00087_mdio@41 {  //Quadratic Tri-Mode Ethernet PHY
+        compatible = "iveia,mdio-bsc-i2c";
+        reg = <0x41>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        sierra_phy0: phy@1 {
+            compatible = "ethernet-phy-ieee802.3-c22";
+            device_type = "ethernet-phy";
+            reg = <1>;
+        };
+    };
 
 	iv_io_00091_switch@77 {
                 compatible = "nxp,pca9547";
