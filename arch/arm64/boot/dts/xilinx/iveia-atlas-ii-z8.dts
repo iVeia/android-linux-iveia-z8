@@ -471,6 +471,13 @@
 	};
 */
 
+	iv_io_00095_switch@77 {
+                compatible = "nxp,pca9547";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0x77>;
+	};
+
 	iv_io_00100_switch@77 {
                 compatible = "nxp,pca9547";
                 #address-cells = <1>;
