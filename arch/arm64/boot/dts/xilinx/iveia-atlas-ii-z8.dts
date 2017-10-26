@@ -476,6 +476,22 @@
                 #address-cells = <1>;
                 #size-cells = <0>;
                 reg = <0x77>;
+
+		i2c@0 {
+			#address-cells = <1>;
+                        #size-cells = <0>;
+                        reg = <0>;
+	
+                        rtc@68 {
+                                compatible = "stm,m41t62";
+                                reg = <0x68>;
+                        };
+
+                        tempsens@4f {
+                                compatible = "national,lm75";
+                                reg = <0x4f>;
+                        };			
+                };		
 	};
 
 	iv_io_00100_switch@77 {
