@@ -1,0 +1,14 @@
+config SND_SOC_IVEIA
+	tristate "SoC Audio for IVEIA reference designs"
+	depends on SND_SOC && (MICROBLAZE || ARCH_ZYNQ)
+	select SND_SOC_GENERIC_DMAENGINE_PCM
+
+config SND_SOC_ADI_IV_AXI_I2S
+	select REGMAP_MMIO
+	tristate
+
+config SND_SOC_Z7E_WM8960
+	tristate "Z7E board sound support"
+	depends on SND_SOC_IVEIA
+	select SND_SOC_ADI_IV_AXI_I2S
+	select SND_SOC_WM8960

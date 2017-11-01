@@ -32,17 +32,28 @@
 	};
 
 	chosen {
-		bootargs = "console=ttyPS0,115200 root=/dev/ram rw earlyprintk";
+		bootargs = "console=ttyPS1,115200 root=/dev/ram rw earlyprintk";
 		stdout-path = "serial0:115200n8";
 	};
 
 	iveia_fb {
 		compatible = "iveia,fb";
 	};
-
-	usb_phy0: phy0 {
-		compatible = "usb-nop-xceiv";
+	
+	usb_phy0: phy0@e0002000 {
+		compatible = "ulpi-phy";
 		#phy-cells = <0>;
+		reg = <0xe0002000 0x1000>;
+		view-port = <0x0170>;
+		drv-vbus;
+	};
+
+	usb_phy1: phy0@e0003000 {
+		compatible = "ulpi-phy";
+		#phy-cells = <0>;
+		reg = <0xe0003000 0x1000>;
+		view-port = <0x0170>;
+		drv-vbus;
 	};
 
 };
@@ -51,6 +62,36 @@
 	ocm: sram@fffc0000 {
 		compatible = "mmio-sram";
 		reg = <0xfffc0000 0x10000>;
+	};
+
+	NOT_iv_io_00099_sdhci1: sdhci@e0101000 {
+		compatible = "arasan,sdhci-8.9a";
+		u-boot,dm-pre-reloc;
+		status = "okay"; 
+		clock-names = "clk_xin", "clk_ahb";
+		clocks = <&clkc 22>, <&clkc 33>;
+		interrupt-parent = <&intc>;
+		interrupts = <0 47 4>;
+		reg = <0xe0101000 0x1000>;
+		broken-adma2;
+	};
+
+	iv_io_00099_sdhci1: sdhci@e0101000 {
+		compatible = "arasan,sdhci-8.9a";
+		u-boot,dm-pre-reloc;
+		status = "okay"; 
+		clock-names = "clk_xin", "clk_ahb";
+		clocks = <&clkc 22>, <&clkc 33>;
+		interrupt-parent = <&intc>;
+		interrupts = <0 47 4>;
+		reg = <0xe0101000 0x1000>;
+		broken-adma2;
+
+		//vmmc-supply = <&wl12xx_reg>;
+
+		disable-wp;
+		non-removeable;
+		cap-power-off-card;
 	};
 
 	iv_io_00079_ethernet@e000b000 { //ETH0 on MOSAIC
@@ -117,6 +158,27 @@
 		use-internal-mdio = <1>;
 	};
 
+	iv_io_00099_eth@e000b000 { //ETH0 on Intrepid
+		compatible = "cdns,gem";
+		reg = <0xe000b000 0x1000>;
+		status = "okay";
+		interrupts = <0 22 4>;
+		clocks = <&clkc 30>, <&clkc 30>, <&clkc 13>;
+		clock-names = "pclk", "hclk", "tx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		use-internal-mdio = <1>;
+		mdio {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			intrepid_phy: phy@0 {
+				compatible = "ethernet-phy-ieee802.3-c22";
+				device_type = "ethernet-phy";
+				reg = <0>;
+			};
+		};
+	};
+
 	iv_io_00050_mdio0: mdio {
 		compatible = "virtual,mdio-gpio";
 		#address-cells = <1>;
@@ -130,6 +192,57 @@
 			reg = <1>;
 		};
 	};
+
+	iv_mb_00049@0 { //Atlas-I-Z7e
+		compatible = "simple-bus";
+		#address-cells = <0x1>;
+		#size-cells = <0x1>;
+		ranges;
+
+		i2c2: i2c@7c000000 {
+			compatible = "iveia,i2c-ocp";
+			reg = <0x7c000000 0x0100>;
+			i2c-clk = <100000>;
+
+			#address-cells = <1>;
+			#size-cell = <0>;
+			wm8960: wm8960@1a {
+				compatible = "wlf,wm8960";
+				#address-cells = <1>;
+				#size-cells = <0>;
+				reg = <0x1a>;
+			};
+		};
+
+                audio_clock: audio_clock {
+                        compatible = "fixed-clock";
+                        #clock-cells = <0>;
+                        clock-frequency = <50000000>;
+                };
+
+                i2s_clk_0: i2s_clk {
+                        compatible = "fixed-clock";
+                        #clock-cells = <0>;
+                        clock-frequency = <100000000>;
+                };
+
+                axi_i2s_0: axi-i2s@0x7c000100 {
+                        compatible = "adi,iv-axi-i2s-1.00.a";
+                        reg = <0x7c000100 0x0100>;
+                        dmas = <&dmac_s 1 &dmac_s 2>;
+                        dma-names = "tx", "rx";
+                        clocks = <&i2s_clk_0 &audio_clock>;
+                        clock-names = "axi", "i2s";
+                };
+
+                z7e_sound {
+                        compatible = "iveia,z7e-sound";
+                        audio-codec = <&wm8960>;
+                        cpu-dai = <&axi_i2s_0>;
+                };
+	};
+
+
 };
 
 &clkc {
@@ -226,30 +339,24 @@
 	};
 };
 
-&sdhci1 {
-	u-boot,dm-pre-reloc;
-	status = "okay"; 
-};
-
 &uart1 {
 	u-boot,dm-pre-reloc;
 	status = "okay";
 };
 
-/*&uart0 {
+&uart0 {
 	u-boot,dm-pre-reloc;
 	status = "okay";
 };
-*/
+
 &usb0 {
 	status = "okay";
 	dr_mode = "otg";
-	phy-type = "ulpi";
 	usb-phy = <&usb_phy0>;
 };
 
 &usb1 {
 	status = "okay";
 	dr_mode = "host";
-	phy-type = "ulpi";
+	usb-phy = <&usb_phy1>;
 };
