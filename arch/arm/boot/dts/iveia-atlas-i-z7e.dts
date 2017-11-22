@@ -324,7 +324,15 @@
 	status = "okay";
 	clock-frequency = <400000>;
 
-	
+	iv_mb_00049_i2c_gpio_exp: gpio@70 {
+		compatible = "nxp,pca9538";
+		reg = <0x70>;
+	};
+
+	iv_mb_00049_i2c_tmp: tmp@48 {
+		compatible = "national,lm75";
+		reg = <0x48>;	
+	};
 };
 
 &sdhci0 {
