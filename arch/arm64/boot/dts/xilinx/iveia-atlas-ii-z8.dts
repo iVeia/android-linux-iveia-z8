@@ -314,7 +314,40 @@
 			};
 		};
 
-		iv_mb_00090_iv_mb_0098_usb1: iv_mb_00090_iv_mb_0098_usb1 { //All boards except Atlas-III-Z8
+		iv_mb_000108_usb0: iv_mb_00108_usb0 { //Atlas-I-Z8 has different Lane setup
+		//iv_usb0: iv_usb0 {
+			#address-cells = <2>;
+			#size-cells = <2>;
+			status = "okay";
+			compatible = "xlnx,zynqmp-dwc3";
+			reg = <0x0 0xff9d0000 0x0 0x100>;
+			clock-names = "bus_clk", "ref_clk";
+			#stream-id-cells = <1>;
+			iommus = <&smmu 0x860>;
+			power-domains = <&pd_usb0>;
+			ranges;
+			nvmem-cells = <&soc_revision>;
+			nvmem-cell-names = "soc_revision";
+            clocks = <&clkc 32>,  <&clkc 34>;
+
+			iv_dwc3_a1_0: iv_dwc3@fe200000 {
+				compatible = "snps,dwc3";
+				status = "okay";
+				reg = <0x0 0xfe200000 0x0 0x40000>;
+				interrupt-parent = <&gic>;
+				interrupts = <0 65 4>, <0 69 4>;
+				snps,quirk-frame-length-adjustment = <0x20>;
+				snps,refclk_fladj;
+
+	            dr_mode = "host";
+	            snps,usb3_lpm_capable;
+	            phy-names = "usb3-phy";
+	            phys = <&lane0 PHY_TYPE_USB3 0 0 100000000>;
+
+			};
+		};
+
+		iv_mb_00090_iv_mb_0098_iv_mb_00108_usb1: iv_mb_00090_iv_mb_0098_iv_mb_00108_usb1 { //All boards except Atlas-III-Z8
 			#address-cells = <2>;
 			#size-cells = <2>;
 			status = "okay";
