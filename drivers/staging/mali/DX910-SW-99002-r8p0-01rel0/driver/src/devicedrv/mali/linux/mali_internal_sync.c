@@ -121,8 +121,13 @@ static void mali_internal_sync_fence_add_fence(struct mali_internal_sync_fence *
 }
 #endif
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
+static int mali_internal_sync_fence_wake_up_wq(wait_queue_entry_t *curr, unsigned mode,
+		int wake_flags, void *key)
+#else
 static int mali_internal_sync_fence_wake_up_wq(wait_queue_t *curr, unsigned mode,
 		int wake_flags, void *key)
+#endif
 {
 	struct mali_internal_sync_fence_waiter *wait;
 	MALI_IGNORE(mode);
@@ -130,8 +135,12 @@ static int mali_internal_sync_fence_wake_up_wq(wait_queue_t *curr, unsigned mode
 	MALI_IGNORE(key);
 
 	wait = container_of(curr, struct mali_internal_sync_fence_waiter, work);
-	list_del_init(&wait->work.task_list);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
+	list_del_init(&wait->work.entry);
+#else
+	list_del_init(&wait->work.task_list);
+#endif
 	wait->callback(wait->work.private, wait);
 	return 1;
 }
@@ -498,7 +507,11 @@ void mali_internal_sync_fence_waiter_init(struct mali_internal_sync_fence_waiter
 	MALI_DEBUG_ASSERT_POINTER(waiter);
 	MALI_DEBUG_ASSERT_POINTER(callback);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
+	INIT_LIST_HEAD(&waiter->work.entry);
+#else
 	INIT_LIST_HEAD(&waiter->work.task_list);
+#endif
 	waiter->callback = callback;
 }
 
@@ -560,8 +573,13 @@ int mali_internal_sync_fence_wait_async(struct mali_internal_sync_fence *sync_fe
 	spin_lock_irqsave(&sync_fence->wq.lock, flags);
 	err =  sync_fence->fence->ops->signaled(sync_fence->fence);
 
-	if (0 == err)
+	if (0 == err){
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
+		__add_wait_queue_entry_tail(&sync_fence->wq, &waiter->work);
+#else
 		__add_wait_queue_tail(&sync_fence->wq, &waiter->work);
+#endif
+	}
 	spin_unlock_irqrestore(&sync_fence->wq.lock, flags);
 
 	return err;
@@ -578,8 +596,13 @@ int mali_internal_sync_fence_cancel_async(struct mali_internal_sync_fence *sync_
 	MALI_DEBUG_ASSERT_POINTER(waiter);
 
 	spin_lock_irqsave(&sync_fence->wq.lock, flags);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
+	if (!list_empty(&waiter->work.entry))
+		list_del_init(&waiter->work.entry);
+#else
 	if (!list_empty(&waiter->work.task_list))
 		list_del_init(&waiter->work.task_list);
+#endif
 	else
 		ret = -ENOENT;
 	spin_unlock_irqrestore(&sync_fence->wq.lock, flags);
