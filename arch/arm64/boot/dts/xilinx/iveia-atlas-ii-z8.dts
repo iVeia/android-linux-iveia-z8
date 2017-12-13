@@ -554,6 +554,11 @@
 &i2c1 {
 	status = "okay";
 	clock-frequency = <400000>;
+
+	iv_mb_00108_tpm29@29{
+		compatible = "atmel,at97sc3204t";
+ 		reg = <0x29>;
+ 	};
 };
 
 &pcie {
