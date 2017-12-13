@@ -1428,6 +1428,13 @@ config SERIAL_XILINX_PS_UART
 	  This driver supports the Cadence UART. It is found e.g. in Xilinx
 	  Zynq.
 
+config SERIAL_INTREPID_RS485
+	tristate "iVeia Helios Intrepid UART with Modem controls support"
+	depends on OF
+	select SERIAL_CORE
+	help
+	  iVeia Helios Intrepid UART with Modem controls support.
+
 config SERIAL_XILINX_PS_UART_CONSOLE
 	bool "Cadence UART console support"
 	depends on SERIAL_XILINX_PS_UART=y

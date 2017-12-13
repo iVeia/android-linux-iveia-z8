@@ -56,7 +56,7 @@ void __iomem *zynq_scu_base;
  * We need to stop things allocating the low memory as DMA can't work in
  * the 1st 512K of memory.
  */
-static void __init zynq_memory_init(void)
+void __init zynq_memory_init(void)
 {
 	if (!__pa(PAGE_OFFSET))
 		memblock_reserve(__pa(PAGE_OFFSET), __pa(swapper_pg_dir));
@@ -147,7 +147,7 @@ out:
 	platform_device_register(&zynq_cpuidle_device);
 }
 
-static void __init zynq_timer_init(void)
+void __init zynq_timer_init(void)
 {
 	zynq_clock_init();
 	of_clk_init(NULL);
@@ -175,13 +175,13 @@ static void __init zynq_scu_map_io(void)
 /**
  * zynq_map_io - Create memory mappings needed for early I/O.
  */
-static void __init zynq_map_io(void)
+void __init zynq_map_io(void)
 {
 	debug_ll_io_init();
 	zynq_scu_map_io();
 }
 
-static void __init zynq_irq_init(void)
+void __init zynq_irq_init(void)
 {
 	zynq_early_efuse_init();
 	zynq_early_slcr_init();

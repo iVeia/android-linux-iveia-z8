@@ -1,0 +1,370 @@
+/*
+ *  Copyright (C) 2011 - 2014 Xilinx
+ *  Copyright (C) 2012 National Instruments Corp.
+ *
+ * This software is licensed under the terms of the GNU General Public
+ * License version 2, as published by the Free Software Foundation, and
+ * may be copied, distributed, and modified under those terms.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+/dts-v1/;
+#include "zynq-7000.dtsi"
+
+/ {
+	model = "Zynq ZC702 Development Board";
+//	compatible = "xlnx,zynq-zc702", "xlnx,zynq-7000";
+	compatible = "iveia,atlas-i-z7e";
+
+	aliases {
+		i2c0 = &i2c0;
+		i2c1 = &i2c1;
+		serial0 = &uart1;
+		mmc0 = &sdhci0;
+	};
+
+	memory@0 {
+		device_type = "memory";
+		reg = <0x0 0x40000000>;
+	};
+
+	chosen {
+		bootargs = "console=ttyPS1,115200 root=/dev/ram rw earlyprintk";
+		stdout-path = "serial0:115200n8";
+	};
+
+	iveia_fb {
+		compatible = "iveia,fb";
+	};
+	
+	usb_phy0: phy0@e0002000 {
+		compatible = "ulpi-phy";
+		#phy-cells = <0>;
+		reg = <0xe0002000 0x1000>;
+		view-port = <0x0170>;
+		drv-vbus;
+	};
+
+	usb_phy1: phy0@e0003000 {
+		compatible = "ulpi-phy";
+		#phy-cells = <0>;
+		reg = <0xe0003000 0x1000>;
+		view-port = <0x0170>;
+		drv-vbus;
+	};
+
+};
+
+&amba {
+	ocm: sram@fffc0000 {
+		compatible = "mmio-sram";
+		reg = <0xfffc0000 0x10000>;
+	};
+
+	NOT_iv_io_00099_sdhci1: sdhci@e0101000 {
+		compatible = "arasan,sdhci-8.9a";
+		u-boot,dm-pre-reloc;
+		status = "okay"; 
+		clock-names = "clk_xin", "clk_ahb";
+		clocks = <&clkc 22>, <&clkc 33>;
+		interrupt-parent = <&intc>;
+		interrupts = <0 47 4>;
+		reg = <0xe0101000 0x1000>;
+		broken-adma2;
+	};
+
+	iv_io_00099_sdhci1: sdhci@e0101000 {
+		compatible = "arasan,sdhci-8.9a";
+		u-boot,dm-pre-reloc;
+		status = "okay"; 
+		clock-names = "clk_xin", "clk_ahb";
+		clocks = <&clkc 22>, <&clkc 33>;
+		interrupt-parent = <&intc>;
+		interrupts = <0 47 4>;
+		reg = <0xe0101000 0x1000>;
+		broken-adma2;
+
+		//vmmc-supply = <&wl12xx_reg>;
+
+		disable-wp;
+		non-removeable;
+		cap-power-off-card;
+	};
+
+	iv_io_00079_ethernet@e000b000 { //ETH0 on MOSAIC
+		compatible = "cdns,gem";
+		reg = <0xe000b000 0x1000>;
+		status = "okay";
+		interrupts = <0 22 4>;
+		clocks = <&clkc 30>, <&clkc 30>, <&clkc 13>;
+		clock-names = "pclk", "hclk", "tx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+           	phy-handle = <&mosaic_phy0>;
+     		use-internal-mdio = <0>;
+	};
+
+	iv_io_00087_ethernet@e000b000 { //ETH0 on Sierra
+		compatible = "cdns,gem";
+		reg = <0xe000b000 0x1000>;
+		status = "okay";
+		interrupts = <0 22 4>;
+		clocks = <&clkc 30>, <&clkc 30>, <&clkc 13>;
+		clock-names = "pclk", "hclk", "tx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+           	phy-handle = <&sierra_phy0>;
+        	use-internal-mdio = <0>;
+	};
+
+	iv_io_00080_ethernet@e000b000 { //ETH0 on Bluepoint
+		compatible = "cdns,gem";
+		reg = <0xe000b000 0x1000>;
+		status = "okay";
+		interrupts = <0 22 4>;
+		clocks = <&clkc 30>, <&clkc 30>, <&clkc 13>;
+		clock-names = "pclk", "hclk", "tx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+           	phy-handle = <&bluepoint_phy0>;
+            	use-internal-mdio = <0>;
+	};
+
+	iv_io_00050_ethernet@e000b000 { //ETH0 on Breckenridge
+		compatible = "cdns,gem";
+		reg = <0xe000b000 0x1000>;
+		status = "okay";
+		interrupts = <0 22 4>;
+		clocks = <&clkc 30>, <&clkc 30>, <&clkc 13>;
+		clock-names = "pclk", "hclk", "tx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+            	phy-handle = <&breck_phy1>;
+            	use-internal-mdio = <0>;
+	};
+
+	iv_io_00074_ethernet@e000b000 { //ETH0 on Captiva
+		compatible = "cdns,gem";
+		reg = <0xe000b000 0x1000>;
+		status = "okay";
+		interrupts = <0 22 4>;
+		clocks = <&clkc 30>, <&clkc 30>, <&clkc 13>;
+		clock-names = "pclk", "hclk", "tx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		use-internal-mdio = <1>;
+	};
+
+	iv_io_00099_eth@e000b000 { //ETH0 on Intrepid
+		compatible = "cdns,gem";
+		reg = <0xe000b000 0x1000>;
+		status = "okay";
+		interrupts = <0 22 4>;
+		clocks = <&clkc 30>, <&clkc 30>, <&clkc 13>;
+		clock-names = "pclk", "hclk", "tx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		use-internal-mdio = <1>;
+		mdio {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			intrepid_phy: phy@0 {
+				compatible = "ethernet-phy-ieee802.3-c22";
+				device_type = "ethernet-phy";
+				reg = <0>;
+			};
+		};
+	};
+
+	iv_io_00050_mdio0: mdio {
+		compatible = "virtual,mdio-gpio";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		gpios = <&iv_io_00050_mdc_gpio_0 0 0 &iv_io_00050_mdc_gpio_0 1 0>;
+
+		breck_phy1: phy@1 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			device_type = "ethernet-phy";
+			reg = <1>;
+		};
+	};
+
+	iv_mb_00049@0 { //Atlas-I-Z7e
+		compatible = "simple-bus";
+		#address-cells = <0x1>;
+		#size-cells = <0x1>;
+		ranges;
+
+		i2c2: i2c@7c000000 {
+			compatible = "iveia,i2c-ocp";
+			reg = <0x7c000000 0x0100>;
+			i2c-clk = <100000>;
+
+			#address-cells = <1>;
+			#size-cell = <0>;
+			wm8960: wm8960@1a {
+				compatible = "wlf,wm8960";
+				#address-cells = <1>;
+				#size-cells = <0>;
+				reg = <0x1a>;
+			};
+		};
+
+                audio_clock: audio_clock {
+                        compatible = "fixed-clock";
+                        #clock-cells = <0>;
+                        clock-frequency = <50000000>;
+                };
+
+                i2s_clk_0: i2s_clk {
+                        compatible = "fixed-clock";
+                        #clock-cells = <0>;
+                        clock-frequency = <100000000>;
+                };
+
+                axi_i2s_0: axi-i2s@0x7c000100 {
+                        compatible = "adi,iv-axi-i2s-1.00.a";
+                        reg = <0x7c000100 0x0100>;
+                        dmas = <&dmac_s 1 &dmac_s 2>;
+                        dma-names = "tx", "rx";
+                        clocks = <&i2s_clk_0 &audio_clock>;
+                        clock-names = "axi", "i2s";
+                };
+
+                z7e_sound {
+                        compatible = "iveia,z7e-sound";
+                        audio-codec = <&wm8960>;
+                        cpu-dai = <&axi_i2s_0>;
+                };
+	};
+
+
+};
+
+&clkc {
+	ps-clk-frequency = <33333333>;
+};
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	z7x_triumph_wm8960: iv_mb_00068_iv_io_00043_wm8960@1a {//Atlas-II-Z7x on Triumph Carrier
+		compatible = "wlf,wm8960";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x1a>;
+	};
+
+	iv_io_00079_mdio@40 {  //Mosaic Tri-Mode Ethernet PHY
+                compatible = "iveia,mdio-bsc-i2c";
+                reg = <0x41>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		mosaic_phy0: phy@1 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			device_type = "ethernet-phy";
+			reg = <1>;
+		};
+	};
+
+
+	iv_io_00080_mdio@40 {  //Bluepoint Tri-Mode Ethernet PHY
+                compatible = "iveia,mdio-bsc-i2c";
+                reg = <0x41>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		bluepoint_phy0: phy@1 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			device_type = "ethernet-phy";
+			reg = <1>;
+		};
+	};
+
+	iv_io_00087_mdio@40 {  //Sierra Tri-Mode Ethernet PHY
+                compatible = "iveia,mdio-bsc-i2c";
+                reg = <0x41>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		sierra_phy0: phy@1 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			device_type = "ethernet-phy";
+			reg = <1>;
+			};
+	};
+
+	iv_io_00050_mdc_gpio_0: iv_io_00050_gpio@20 {
+		compatible = "ti,tca6416";
+		reg = <0x20>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	iv_io_00058_i2c_gpio_0: iv_io_00058_i2c_gpio@22 {
+		compatible = "ti,tca6424";
+		reg = <0x22>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	iv_io_00074_rtc@68 {
+		compatible = "st,m41t62";
+		reg = <0x68>;	
+	};
+};
+
+&i2c1 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	iv_mb_00049_i2c_gpio_exp: gpio@70 {
+		compatible = "nxp,pca9538";
+		reg = <0x70>;
+	};
+
+	iv_mb_00049_i2c_tmp: tmp@48 {
+		compatible = "national,lm75";
+		reg = <0x48>;	
+	};
+};
+
+&sdhci0 {
+	u-boot,dm-pre-reloc;
+	status = "okay";
+	iv_io_00058_wlcore: iv_io_00058_wlcore@2 {
+		compatible = "ti,wl1271";
+		reg = <2>;
+		interrupt-parent = <&intc>;
+		interrupts = <0 57 4>;//89-32
+		ref-clock-frequency = <38400000>;
+	};
+};
+
+&uart1 {
+	u-boot,dm-pre-reloc;
+	status = "okay";
+};
+
+&uart0 {
+	u-boot,dm-pre-reloc;
+	status = "okay";
+};
+
+&usb0 {
+	status = "okay";
+	dr_mode = "otg";
+	usb-phy = <&usb_phy0>;
+};
+
+&usb1 {
+	status = "okay";
+	dr_mode = "host";
+	usb-phy = <&usb_phy1>;
+};

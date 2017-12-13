@@ -43,6 +43,11 @@ extern void zynq_slcr_init_postload_fpga(void);
 extern void __iomem *zynq_slcr_base;
 extern void __iomem *zynq_scu_base;
 
+extern void __init zynq_memory_init(void);
+extern void __init zynq_map_io(void);
+extern void __init zynq_irq_init(void);
+extern void __init zynq_timer_init(void);
+
 void zynq_pm_late_init(void);
 extern unsigned int zynq_sys_suspend_sz;
 int zynq_sys_suspend(void __iomem *ddrc_base, void __iomem *slcr_base);

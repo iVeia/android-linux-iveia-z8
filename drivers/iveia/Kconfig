@@ -1,0 +1,17 @@
+menu "iVeia Titan Processing Modules"
+
+source "drivers/char/ocp/Kconfig"
+
+source "drivers/char/zap_intr/Kconfig"
+
+source "drivers/char/spi_char/Kconfig"
+
+source "drivers/char/zap/Kconfig"
+
+source "drivers/char/events/Kconfig"
+
+source "drivers/char/iomem/Kconfig"
+
+source "drivers/char/iv_bitbanged_i2c/Kconfig"
+
+endmenu
