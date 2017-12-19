@@ -130,6 +130,41 @@
 
 // ETH3
 
+    iv_bp_00052_mdio0: mdio {
+	    compatible = "virtual,mdio-gpio";
+	    #address-cells = <1>;
+	    #size-cells = <0>;
+	    gpios = < &iv_bp_00052_gpio 1 0 &iv_bp_00052_gpio 0 0 >;
+
+        aep_phy0: phy@0 {
+            compatible = "ethernet-phy-ieee802.3-c22";
+            device_type = "ethernet-phy";
+            reg = <0>;
+        };
+    };
+
+        iv_bp_00052_gem: iv_bp_00052_ethernet@ff0e0000 {
+		compatible = "cdns,zynqmp-gem";
+		status = "okay";
+		interrupt-parent = <&gic>;
+		interrupts = <0 63 4>, <0 63 4>;
+		reg = <0x0 0xff0e0000 0x0 0x1000>;
+		clocks = <&clkc 31>, <&clkc 52>, <&clkc 48>, <&clkc 52>;
+		clock-names = "pclk", "hclk", "tx_clk", "rx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#stream-id-cells = <1>;
+		iommus = <&smmu 0x877>;
+		power-domains = <&pd_eth3>;
+        phy-mode = "sgmii";
+        phy-names = "sgmii-phy";
+
+            phy-handle = <&aep_phy0>;
+            use-internal-mdio = <0>;
+
+
+        };
+
 	iv_io_00073_gem: iv_io_00073_ethernet@ff0e0000 {
 		compatible = "cdns,zynqmp-gem";
 		status = "okay";
@@ -419,6 +454,14 @@
 &i2c0 {
 	status = "okay";
 	clock-frequency = <400000>;
+
+	iv_bp_00052_gpio: iv_bp_00052_i2c_gpio@71 { //Triumph AEP Module
+		compatible = "nxp,pca9538";
+		reg = <0x71>;
+        gpio-controller;
+        #gpio-cells = <2>;
+
+	};
 
     iv_io_00087_mdio@41 {  //Quadratic Tri-Mode Ethernet PHY
         compatible = "iveia,mdio-bsc-i2c";

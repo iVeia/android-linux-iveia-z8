@@ -232,8 +232,8 @@ static int mdio_gpio_probe(struct platform_device *pdev)
 		bus_id = pdev->id;
 	}
 
-	if (!pdata)
-		return -ENODEV;
+	if (!pdata)//GPIO Driver is not loaded yet
+		return -EPROBE_DEFER;
 
 	new_bus = mdio_gpio_bus_init(&pdev->dev, pdata, bus_id);
 	if (!new_bus)
