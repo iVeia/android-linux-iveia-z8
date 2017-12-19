@@ -84,8 +84,8 @@
 		reg = <0xE0001000 0x1000>;
 		interrupts = <0 50 4>;
 
-		rgpio = <&gpio0 2 0>;
-		wgpio = <&gpio0 3 0>;
+		rgpio = <&gpio0 10 0>;
+		wgpio = <&gpio0 11 0>;
 	};
 
 	sdhci0: sdhci@e0100000 {

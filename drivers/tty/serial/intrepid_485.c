@@ -311,13 +311,14 @@ static void cdns_uart_handle_tx(void *dev_id)
 	unsigned int numbytes;
 	struct cdns_uart *dat = (struct cdns_uart *)port->private_data;
 
-	gpio_set_value(dat->readen,1);
-	gpio_set_value(dat->writeen,1);
-
 	if (uart_circ_empty(&port->state->xmit)) {
 		writel(CDNS_UART_IXR_TXEMPTY, port->membase + CDNS_UART_IDR);
 	} else {
 		numbytes = port->fifosize;
+
+		gpio_set_value(dat->readen,1);
+		gpio_set_value(dat->writeen,1);	
+
 		while (numbytes && !uart_circ_empty(&port->state->xmit) &&
 		       !(readl(port->membase + CDNS_UART_SR) & CDNS_UART_SR_TXFULL)) {
 			/*
@@ -345,6 +346,16 @@ static void cdns_uart_handle_tx(void *dev_id)
 		if (uart_circ_chars_pending(
 				&port->state->xmit) < WAKEUP_CHARS)
 			uart_write_wakeup(port);
+	}
+
+
+// wait for tx fifo to empty
+	if (!(readl(port->membase + CDNS_UART_CR) &
+				CDNS_UART_CR_TX_DIS)) {
+		while (!(readl(port->membase + CDNS_UART_SR) &
+				CDNS_UART_SR_TXEMPTY)) {
+			cpu_relax();
+		}
 	}
 
 	gpio_set_value(dat->readen,0);
@@ -1524,7 +1535,7 @@ static int cdns_uart_probe(struct platform_device *pdev)
 		return ERR_PTR(cdns_uart_data->writeen);
 
 	ret = gpio_request_one(cdns_uart_data->readen,
-		GPIOF_DIR_OUT | GPIOF_INIT_HIGH,
+		GPIOF_DIR_OUT,
 		"rs485_ren");
 	if (ret)
 		return ret;
