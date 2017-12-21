@@ -30,6 +30,8 @@
 #include <linux/irq.h>
 #include <linux/io.h>
 #include <linux/of.h>
+#include <linux/delay.h>
+#include <linux/workqueue.h>
 #include <linux/module.h>
 #include <linux/pm_runtime.h>
 
@@ -197,6 +199,7 @@ struct cdns_uart {
 	u32			quirks;
 	int			readen;
 	int			writeen;
+	struct work_struct	modem_sig_wq;
 };
 struct cdns_platform_data {
 	u32 quirks;
@@ -316,7 +319,6 @@ static void cdns_uart_handle_tx(void *dev_id)
 	} else {
 		numbytes = port->fifosize;
 
-		gpio_set_value(dat->readen,1);
 		gpio_set_value(dat->writeen,1);	
 
 		while (numbytes && !uart_circ_empty(&port->state->xmit) &&
@@ -348,18 +350,14 @@ static void cdns_uart_handle_tx(void *dev_id)
 			uart_write_wakeup(port);
 	}
 
+}
 
-// wait for tx fifo to empty
-	if (!(readl(port->membase + CDNS_UART_CR) &
-				CDNS_UART_CR_TX_DIS)) {
-		while (!(readl(port->membase + CDNS_UART_SR) &
-				CDNS_UART_SR_TXEMPTY)) {
-			cpu_relax();
-		}
-	}
-
-	gpio_set_value(dat->readen,0);
+static void modem_sig_clear(struct work_struct *work)
+{
+	struct cdns_uart *dat = container_of(work, struct cdns_uart, modem_sig_wq);
+	msleep(1);
 	gpio_set_value(dat->writeen,0);
+
 }
 
 /**
@@ -373,6 +371,8 @@ static irqreturn_t cdns_uart_isr(int irq, void *dev_id)
 {
 	struct uart_port *port = (struct uart_port *)dev_id;
 	unsigned int isrstatus;
+	struct cdns_uart *dat = (struct cdns_uart *)port->private_data;
+	
 
 	spin_lock(&port->lock);
 
@@ -390,6 +390,8 @@ static irqreturn_t cdns_uart_isr(int irq, void *dev_id)
 		cdns_uart_handle_rx(dev_id, isrstatus);
 
 	spin_unlock(&port->lock);
+	schedule_work(&dat->modem_sig_wq);
+
 	return IRQ_HANDLED;
 }
 
@@ -1545,6 +1547,8 @@ static int cdns_uart_probe(struct platform_device *pdev)
 		"rs485_de");
 	if (ret)
 		return ret;
+	
+	INIT_WORK(&cdns_uart_data->modem_sig_wq, modem_sig_clear);
 	
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
