@@ -55,7 +55,7 @@
 
 &amba {
 //ETH0
-	default_eth0: NOT_iv_io_00093_NOT_iv_io_00073_ethernet@ff0b0000 {
+	default_eth0: NOT_iv_io_00110_NOT_iv_io_00093_NOT_iv_io_00073_ethernet@ff0b0000 {
 			compatible = "cdns,zynqmp-gem";
 			status = "okay";
 			phy-mode = "gmii";
@@ -69,6 +69,33 @@
 			#stream-id-cells = <1>;
 			iommus = <&smmu 0x874>;
 			power-domains = <&pd_eth0>;
+	};
+
+	merrimack_eth0: iv_io_00110_ethernet@ff0b0000 {
+			compatible = "cdns,zynqmp-gem";
+			status = "okay";
+			phy-mode = "gmii";
+			interrupt-parent = <&gic>;
+			interrupts = <0 57 4>, <0 57 4>;
+			reg = <0x0 0xff0b0000 0x0 0x1000>;
+			clocks = <&clkc 45>, <&clkc 45>, <&clkc 49>;
+			clock-names = "pclk", "tx_clk", "hclk";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			#stream-id-cells = <1>;
+			iommus = <&smmu 0x874>;
+			power-domains = <&pd_eth0>;
+
+			use-internal-mdio = <1>;
+			mdio {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				merrimack_h_phy: phy@3 {
+				compatible = "ethernet-phy-ieee802.3-c22";
+				device_type = "ethernet-phy";
+				reg = <3>;
+				};
+			};
 	};
 
 	blackwing_maveriq_eth0: iv_io_00093_iv_io_00073_gem@ff0b0000 { //USED FOR ETHERNET_SWITCH_EXAMPLE. MDIO Connected to SGMII CORE
@@ -95,7 +122,7 @@
     	};
 
 // ETH1
-	iv_gem1: iv_ethernet@ff0c0000 {
+	iv_gem1: NOT_iv_io_00110_iv_ethernet@ff0c0000 {
 		compatible = "cdns,zynqmp-gem";
 		status = "okay";
                 phy-mode = "gmii";
@@ -110,6 +137,34 @@
 		iommus = <&smmu 0x875>;
 		power-domains = <&pd_eth1>;
 	};
+
+	merrimack_gem1: iv_io_00110_iv_ethernet@ff0c0000 {
+		compatible = "cdns,zynqmp-gem";
+		status = "okay";
+                phy-mode = "gmii";
+		interrupt-parent = <&gic>;
+		interrupts = <0 59 4>, <0 59 4>;
+		reg = <0x0 0xff0c0000 0x0 0x1000>;
+		clocks = <&clkc 46>, <&clkc 46>, <&clkc 50>;
+		clock-names = "pclk", "tx_clk", "hclk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#stream-id-cells = <1>;
+		iommus = <&smmu 0x875>;
+		power-domains = <&pd_eth1>;
+
+		use-internal-mdio = <1>;
+		mdio {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			merrimack_n_phy: phy@0 {
+				compatible = "ethernet-phy-ieee802.3-c22";
+				device_type = "ethernet-phy";
+				reg = <0>;
+			};
+		};
+	};
+
 
 // ETH2
 	iv_gem2: iv_ethernet@ff0d0000 {
