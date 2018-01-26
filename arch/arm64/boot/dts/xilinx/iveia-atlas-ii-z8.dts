@@ -647,6 +647,26 @@
                         };			
                 };		
 	};
+
+        iv_io_00110_rtc@68 {
+            compatible = "stm,m41t62";
+            reg = <0x68>;
+        };
+
+	iv_io_00110_i2c_gpio@22 {
+		compatible = "ti,tca6424";
+		reg = <0x22>;
+	        gpio-controller;
+	        #gpio-cells = <2>;
+	};
+	
+	iv_io_00110_i2c_gpio@23 {
+		compatible = "ti,tca6424";
+		reg = <0x23>;
+        	gpio-controller;
+        	#gpio-cells = <2>;
+	};
+
 };
 
 &i2c1 {
