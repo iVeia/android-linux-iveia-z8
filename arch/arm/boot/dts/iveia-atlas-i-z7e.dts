@@ -318,6 +318,48 @@
 		compatible = "st,m41t62";
 		reg = <0x68>;	
 	};
+
+	iv_io_00059_mux@77 {
+		compatible = "nxp,pca9547";
+		reg = <0x77>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		i2c@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+
+			gpio@21 {
+				compatible = "ti,tca6416";
+				reg = <0x21>;
+			};
+
+			gpio@22 {
+				compatible = "ti,tca6424";
+				reg = <0x22>;
+			};
+
+			gpio@23 {
+				compatible = "ti,tca6424";
+				reg = <0x23>;
+			};
+
+			rtc@68 {
+				compatible = "st,m41t62";
+				reg = <0x68>;	
+			};
+
+			touch@4b {
+				compatible = "atmel,mXT224";
+				reg = <0x4b>;
+				interrupt-parent = <&intc>;
+				interrupts = <0 55 4>;
+			};
+		};
+	
+	};
+
 };
 
 &i2c1 {
