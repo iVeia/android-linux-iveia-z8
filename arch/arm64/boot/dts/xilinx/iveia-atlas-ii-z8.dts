@@ -685,7 +685,19 @@
 };
 
 &qspi {
-	status = "okay";
+    status = "okay";
+    is-dual = <0>;
+    iv_mb_00090_flash@0 {
+        compatible = "n25q128a13";
+        #address-cells = <1>;
+        #size-cells = <1>;
+        reg = <0x0>;
+        spi-max-frequency = <50000000>;
+        partition@qspi-fsbl-uboot {
+            label = "qspi-fsbl-uboot";
+            reg = <0x0 0x1000000>;
+        };
+    };
 };
 
 &spi0 {
