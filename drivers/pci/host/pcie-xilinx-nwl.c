@@ -810,6 +810,13 @@ static int nwl_pcie_probe(struct platform_device *pdev)
 		return err;
 	}
 
+	//iVeia Addition. 
+	//   If this driver is present, but PCI is NOT enabled in the FSBL, the system will crash.
+	//   This fix just returns an error instead of crashing the kernel
+	if (!nwl_phy_link_up(pcie))//Test Bit 1 of 0xfd480238
+		return -EINVAL;
+	//End of iVeia Addition
+
 	pcie->clk = devm_clk_get(dev, NULL);
 	if (IS_ERR(pcie->clk))
 		return PTR_ERR(pcie->clk);
