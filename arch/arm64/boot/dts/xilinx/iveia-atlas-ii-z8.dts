@@ -404,7 +404,7 @@
 			};
 		};
 
-		iv_mb_000108_usb0: iv_mb_00108_usb0 { //Atlas-I-Z8 has different Lane setup
+		iv_mb_00108_usb0: iv_mb_00108_usb0 { //Atlas-I-Z8 has different Lane setup
 		//iv_usb0: iv_usb0 {
 			#address-cells = <2>;
 			#size-cells = <2>;
