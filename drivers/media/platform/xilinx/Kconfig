@@ -114,4 +114,10 @@ config VIDEO_XILINX_CSI2RXSS
 	---help---
 	Driver for Xilinx MIPI CSI2 Rx Subsystem
 
+config VIDEO_XILINX_DUMMY
+        tristate "Xilinx dumy Video Source"
+        depends on VIDEO_XILINX
+        ---help---
+           Driver for the Xilinx dummy video source
+
 endif #VIDEO_XILINX
