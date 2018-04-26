@@ -594,6 +594,37 @@
                 };		
 	};
 
+    iv_io_00096_switch@77 {
+        compatible = "nxp,pca9547";
+        #address-cells = <1>;
+        #size-cells = <0>;
+        reg = <0x77>;
+	
+        i2c@0 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <0>;
+
+            rtc@68 {
+                compatible = "stm,m41t62";
+                reg = <0x68>;
+            };
+
+            tempsens@4f {
+                compatible = "national,lm75";
+                reg = <0x4f>;
+            };
+
+            gpio@22 {
+                compatible = "ti,tca6424";
+                reg = <0x22>;
+                gpio-controller;
+                #gpio-cells = <2>;
+            };
+
+        };
+    };
+
 /*	tsc@4a {
 		reg = <0x4a>;
 		compatible = "atmel,maxtouch";
