@@ -13,6 +13,9 @@ choice
 config ARM_MALI_R7P0_00REL0
 	bool "r7p0-00rel0"
 
+config ARM_MALI_R8P0_01REL0
+	bool "r8p0-01rel0"
+
 endchoice
 
 # Setup default options
@@ -26,6 +29,10 @@ config MALI_DT
 # Source different driver versions
 if ARM_MALI_R7P0_00REL0
 source "drivers/staging/mali/DX910-SW-99002-r7p0-00rel0/driver/src/devicedrv/mali/Kconfig"
+endif
+
+if ARM_MALI_R8P0_01REL0
+source "drivers/staging/mali/DX910-SW-99002-r8p0-01rel0/driver/src/devicedrv/mali/Kconfig"
 endif
 
 endif
