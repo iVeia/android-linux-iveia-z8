@@ -77,33 +77,82 @@
 		startup-delay-us = <70000>;
 	};
 
-	serial@80000000 {
-		compatible = "xlnx,xps-uartlite-1.00.a";
-		reg = <0x80000000 0x1000>;
-		interrupts = < 0 29 4 >;
-		clock = <100000000>;
-	};
 
-	serial@80010000 {
-		compatible = "xlnx,xps-uartlite-1.00.a";
-		reg = <0x80010000 0x1000>;
-		interrupts = < 0 30 4 >;
-		clock = <100000000>;
-	};
+    axi_uart0: serial@80000000 {
+        clock-frequency = <100000000>;
+        compatible = "xlnx,axi-uart16550-1.01.a", "xlnx,xps-uart16550-2.00.a", "ns16550";
+        current-speed = <115200>;
+        device_type = "serial";
+        interrupts = < 0 29 4 >;
+        reg = < 0x80000000 0x10000 >;
+        reg-offset = <0x1000>;
+        reg-shift = <2>;
+        xlnx,external-xin-clk-hz = <0x5F5E100>;
+        xlnx,family = "zynq";
+        xlnx,has-external-rclk = <0x0>;
+        xlnx,has-external-xin = <0x0>;
+        xlnx,is-a-16550 = <0x1>;
+        xlnx,s-axi-aclk-freq-hz = <0x5F5E100>;
+        xlnx,use-modem-ports = <0x0>;
+        xlnx,use-user-ports = <0x0>;
+    };
 
-	serial@80020000 {
-		compatible = "xlnx,xps-uartlite-1.00.a";
-		reg = <0x80020000 0x1000>;
-		interrupts = < 0 31 4 >;
-		clock = <100000000>;
-	};
+    axi_uart1: serial@80010000 {
+        clock-frequency = <100000000>;
+        compatible = "xlnx,axi-uart16550-1.01.a", "xlnx,xps-uart16550-2.00.a", "ns16550";
+        current-speed = <115200>;
+        device_type = "serial";
+        interrupts = < 0 30 4 >;
+        reg = < 0x80010000 0x10000 >;
+        reg-offset = <0x1000>;
+        reg-shift = <2>;
+        xlnx,external-xin-clk-hz = <0x5F5E100>;
+        xlnx,family = "zynq";
+        xlnx,has-external-rclk = <0x0>;
+        xlnx,has-external-xin = <0x0>;
+        xlnx,is-a-16550 = <0x1>;
+        xlnx,s-axi-aclk-freq-hz = <0x5F5E100>;
+        xlnx,use-modem-ports = <0x0>;
+        xlnx,use-user-ports = <0x0>;
+    };
 
-	serial@80030000 {
-		compatible = "xlnx,xps-uartlite-1.00.a";
-		reg = <0x80030000 0x1000>;
-		interrupts = < 0 32 4 >;
-		clock = <100000000>;
-	};
+    axi_uart2: serial@80020000 {
+        clock-frequency = <100000000>;
+        compatible = "xlnx,axi-uart16550-1.01.a", "xlnx,xps-uart16550-2.00.a", "ns16550";
+        current-speed = <115200>;
+        device_type = "serial";
+        interrupts = < 0 31 4 >;
+        reg = < 0x80020000 0x10000 >;
+        reg-offset = <0x1000>;
+        reg-shift = <2>;
+        xlnx,external-xin-clk-hz = <0x5F5E100>;
+        xlnx,family = "zynq";
+        xlnx,has-external-rclk = <0x0>;
+        xlnx,has-external-xin = <0x0>;
+        xlnx,is-a-16550 = <0x1>;
+        xlnx,s-axi-aclk-freq-hz = <0x5F5E100>;
+        xlnx,use-modem-ports = <0x0>;
+        xlnx,use-user-ports = <0x0>;
+    };
+
+    axi_uart3: serial@80030000 {
+        clock-frequency = <100000000>;
+        compatible = "xlnx,axi-uart16550-1.01.a", "xlnx,xps-uart16550-2.00.a", "ns16550";
+        current-speed = <115200>;
+        device_type = "serial";
+        interrupts = < 0 32 4 >;
+        reg = < 0x80030000 0x10000 >;
+        reg-offset = <0x1000>;
+        reg-shift = <2>;
+        xlnx,external-xin-clk-hz = <0x5F5E100>;
+        xlnx,family = "zynq";
+        xlnx,has-external-rclk = <0x0>;
+        xlnx,has-external-xin = <0x0>;
+        xlnx,is-a-16550 = <0x1>;
+        xlnx,s-axi-aclk-freq-hz = <0x5F5E100>;
+        xlnx,use-modem-ports = <0x0>;
+        xlnx,use-user-ports = <0x0>;
+    };
 
 	sdhci0: sdhci@e0100000 {
 		compatible = "arasan,sdhci-8.9a";
