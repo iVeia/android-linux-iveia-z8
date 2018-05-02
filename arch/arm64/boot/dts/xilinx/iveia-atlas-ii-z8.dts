@@ -371,6 +371,32 @@
         };
         };
 
+        iv_io_00118_gem: iv_io_00118_ethernet@ff0e0000 {
+		compatible = "cdns,zynqmp-gem";
+		status = "okay";
+		interrupt-parent = <&gic>;
+		interrupts = <0 63 4>, <0 63 4>;
+		reg = <0x0 0xff0e0000 0x0 0x1000>;
+		clocks = <&clkc 31>, <&clkc 52>, <&clkc 48>, <&clkc 52>;
+		clock-names = "pclk", "hclk", "tx_clk", "rx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#stream-id-cells = <1>;
+		iommus = <&smmu 0x877>;
+		power-domains = <&pd_eth3>;
+        phy-mode = "sgmii";
+        phy-names = "sgmii-phy";
+
+            phy-handle = <&atp_phy0>;
+            use-internal-mdio = <1>;
+
+        atp_phy0: phy@0 {
+            compatible = "ethernet-phy-ieee802.3-c22";
+            device_type = "ethernet-phy";
+            reg = <0>;
+        };
+        };
+
 		iv_mb_00090_iv_mb_0098_usb0: iv_mb_00090_iv_mb_0098_usb0 { //All boards except Atlas-III-Z8
 		//iv_usb0: iv_usb0 {
 			#address-cells = <2>;
