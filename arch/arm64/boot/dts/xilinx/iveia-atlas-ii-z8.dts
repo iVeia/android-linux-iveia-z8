@@ -54,6 +54,14 @@
 
 
 &amba {
+
+		sv_driver_plat@80000000 {
+			compatible = "xlnx,sv_driver_plat";
+			interrupt-parent = <&gic>;
+			interrupts = <0x0 106 0x4>;
+			reg = <0x0 0x80000000 0x0 0x1000 0x0 0x80001000 0x0 0x1000 0x0 0x80002000 0x0 0x1000 0x0 0x88000000 0x0 0x4000000 0x0 0x8C000000 0x0 0x4000000>;
+		};
+
 //ETH0
 	default_eth0: NOT_iv_io_00110_NOT_iv_io_00093_NOT_iv_io_00073_ethernet@ff0b0000 {
 			compatible = "cdns,zynqmp-gem";
