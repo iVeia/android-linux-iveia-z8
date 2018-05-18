@@ -107,9 +107,9 @@
 		non-removeable;
 		cap-power-off-card;
 	};
-
+/*
 	eth@e000b000 { //ETH0 on Helios
-		compatible = "cdns,gem";
+		compatible = "cdns,zynq-gem", "cdns,gem";
 		reg = <0xe000b000 0x1000>;
 		status = "okay";
 		interrupts = <0 22 4>;
@@ -128,9 +128,9 @@
 			};
 		};
 	};
-
-	ethernet@e000c000 { //ETH1 on BLND
-		compatible = "cdns,gem";
+*/
+	ethernet@e000c000 { //ETH0 on BLND
+		compatible = "cdns,zynq-gem", "cdns,gem";
 		reg = <0xe000c000 0x1000>;
 		status = "okay";
 		interrupts = <0 45 4>;
@@ -139,6 +139,14 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 		use-internal-mdio = <1>;
+
+		phy-mode = "rgmii-id";
+
+		fixed-link {
+			speed = <1000>;
+			full-duplex;
+		};
+
 		mdio {
 			#address-cells = <1>;
 			#size-cells = <0>;
