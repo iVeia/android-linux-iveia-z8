@@ -168,13 +168,8 @@
 	status = "okay";
 	clock-frequency = <400000>;
 
-	tmp@4f {
-		compatible = "national,lm75";
-		reg = <0x4f>;
-	};
-
         i2cswitch@70 {
-                compatible = "nxp,pca9545";
+                compatible = "nxp,pca9546";
                 #address-cells = <1>;
                 #size-cells = <0>;
                 reg = <0x70>;
@@ -184,22 +179,22 @@
                         #size-cells = <0>;
                         reg = <0>;
 
-		        gpio@40 {
+					gpio@40 {
                 		compatible = "ti,tca6408";
                 		reg = <0x40>;
                 		gpio-controller;
                 		#gpio-cells = <2>;
-        		};
+        			};
 	
-			tmp@48 {
-				compatible = "national,lm75";
-				reg = <0x48>;
-			};
+					tmp@48 {
+						compatible = "national,lm75";
+						reg = <0x48>;
+					};
 
-			rtc@68 {
-				compatible = "st,m41t62";
-				reg = <0x68>;	
-			};
+					rtc@68 {
+						compatible = "m41t62";
+						reg = <0x68>;	
+					};
                 };
 
                 i2c@1 {
@@ -210,14 +205,13 @@
                 };
 
         };
-	
-
 };
-
+/*
 &i2c1 {
 	status = "okay";
 	clock-frequency = <400000>;
 };
+*/
 
 &qspi {
 	u-boot,dm-pre-reloc;
