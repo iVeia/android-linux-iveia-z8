@@ -179,11 +179,14 @@
                         #size-cells = <0>;
                         reg = <0>;
 
-					gpio@40 {
+					gpio@20 {
                 		compatible = "ti,tca6408";
-                		reg = <0x40>;
+                		reg = <0x20>;
                 		gpio-controller;
                 		#gpio-cells = <2>;
+
+                        interrupt-parent = <&gpio0>;
+                        interrupts = <0 24 2>;
         			};
 	
 					tmp@48 {
