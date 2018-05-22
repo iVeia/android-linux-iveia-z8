@@ -757,5 +757,5 @@ MACHINE_START(IV_ATLAS_I_Z7E, "iVeia Atlas-I-Z7e")
 	.init_time	= zynq_timer_init,
 	.dt_compat	= zynq_dt_match,
 	.reserve	= zynq_memory_init,
-	.restart	= iv_z7e_system_reset,
+	//.restart	= iv_z7e_system_reset,//Moved to device tree
 MACHINE_END
