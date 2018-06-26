@@ -752,7 +752,7 @@
 &qspi {
     status = "okay";
     is-dual = <0>;
-    iv_mb_00090_flash@0 {
+    flash@0 {
         compatible = "n25q128a13";
         #address-cells = <1>;
         #size-cells = <1>;
