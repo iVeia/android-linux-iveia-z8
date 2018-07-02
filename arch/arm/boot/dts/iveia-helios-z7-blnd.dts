@@ -1,0 +1,276 @@
+/*
+ *  Copyright (C) 2011 - 2014 Xilinx
+ *  Copyright (C) 2012 National Instruments Corp.
+ *
+ * This software is licensed under the terms of the GNU General Public
+ * License version 2, as published by the Free Software Foundation, and
+ * may be copied, distributed, and modified under those terms.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+/dts-v1/;
+#include "zynq-7000.dtsi"
+
+/ {
+	model = "Zynq ZC702 Development Board";
+	compatible = "iveia,atlas-i-z7e", "iveia,helios-z7";
+
+	aliases {
+		i2c0 = &i2c0;
+		i2c1 = &i2c1;
+		serial0 = &uart1;
+		spi0 = &qspi;
+		mmc0 = &sdhci0;
+	};
+
+	memory@0 {
+		device_type = "memory";
+		reg = <0x0 0x40000000>;
+	};
+
+	chosen {
+		bootargs = "console=ttyPS1,115200 root=/dev/ram rw earlyprintk";
+		stdout-path = "serial0:115200n8";
+	};
+
+	iveia_fb {
+		compatible = "iveia,fb";
+	};
+	
+	usb_phy0: phy0@e0002000 {
+		compatible = "ulpi-phy";
+		#phy-cells = <0>;
+		reg = <0xe0002000 0x1000>;
+		view-port = <0x0170>;
+		drv-vbus;
+	};
+
+	usb_phy1: phy0@e0003000 {
+		compatible = "ulpi-phy";
+		#phy-cells = <0>;
+		reg = <0xe0003000 0x1000>;
+		view-port = <0x0170>;
+		drv-vbus;
+	};
+
+};
+
+&amba {
+	ocm: sram@fffc0000 {
+		compatible = "mmio-sram";
+		reg = <0xfffc0000 0x10000>;
+	};
+
+	lwb_reg: reg@1 {
+		compatible = "regulator-fixed";
+		regulator-name = "lwb-wifi";
+
+		regulator-min-microvolt = <3300000>; /* Actually 1.8V, but this keeps the driver happy */
+		regulator-max-microvolt = <3300000>;
+            		
+		gpio = <&gpio0 52 0>;
+
+		enable-active-high;
+		regulator-boot-on;
+		startup-delay-us = <70000>;
+	};
+/*
+	uart1: serial@e0001000 {
+		compatible = "iveia,intrepid-rs485";
+		status = "okay";
+		clocks = <&clkc 24>, <&clkc 41>;
+		clock-names = "uart_clk", "pclk";
+		reg = <0xE0001000 0x1000>;
+		interrupts = <0 50 4>;
+
+		rgpio = <&gpio0 10 0>;
+		wgpio = <&gpio0 11 0>;
+	};
+*/
+	sdhci0: sdhci@e0100000 {
+		compatible = "arasan,sdhci-8.9a";
+		u-boot,dm-pre-reloc;
+		status = "okay"; 
+		clock-names = "clk_xin", "clk_ahb";
+		clocks = <&clkc 21>, <&clkc 32>;
+		interrupt-parent = <&intc>;
+		interrupts = <0 24 4>;
+		reg = <0xe0100000 0x1000>;
+		broken-adma2;
+
+		vmmc-supply = <&lwb_reg>;
+
+		disable-wp;
+		non-removeable;
+		cap-power-off-card;
+	};
+/*
+	eth@e000b000 { //ETH0 on Helios
+		compatible = "cdns,zynq-gem", "cdns,gem";
+		reg = <0xe000b000 0x1000>;
+		status = "okay";
+		interrupts = <0 22 4>;
+		clocks = <&clkc 30>, <&clkc 30>, <&clkc 13>;
+		clock-names = "pclk", "hclk", "tx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		use-internal-mdio = <1>;
+		mdio {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			helios_phy: phy@0 {
+				compatible = "ethernet-phy-ieee802.3-c22";
+				device_type = "ethernet-phy";
+				reg = <0>;
+			};
+		};
+	};
+*/
+	ethernet@e000c000 { //ETH0 on BLND
+		compatible = "cdns,zynq-gem", "cdns,gem";
+		reg = <0xe000c000 0x1000>;
+		status = "okay";
+		interrupts = <0 45 4>;
+		clocks = <&clkc 31>, <&clkc 31>, <&clkc 14>;
+		clock-names = "pclk", "hclk", "tx_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		use-internal-mdio = <1>;
+
+		phy-mode = "rgmii-id";
+
+		fixed-link {
+			speed = <1000>;
+			full-duplex;
+		};
+
+		mdio {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			blnd_phy: phy@1 {
+				compatible = "ethernet-phy-ieee802.3-c22";
+				device_type = "ethernet-phy";
+				reg = <1>;
+			};
+		};
+
+	};
+};
+
+&clkc {
+	ps-clk-frequency = <33333333>;
+};
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+        i2cswitch@70 {
+                compatible = "nxp,pca9546";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0x70>;
+
+                i2c@0 {
+                        #address-cells = <1>;
+                        #size-cells = <0>;
+                        reg = <0>;
+
+					gpio@20 {
+                		compatible = "ti,tca6408";
+                		reg = <0x20>;
+                		gpio-controller;
+                		#gpio-cells = <2>;
+
+                        interrupt-parent = <&gpio0>;
+                        interrupts = <0 24 2>;
+        			};
+	
+					tmp@48 {
+						compatible = "national,lm75";
+						reg = <0x48>;
+					};
+
+					rtc@68 {
+						compatible = "m41t62";
+						reg = <0x68>;	
+					};
+                };
+
+                i2c@1 {
+                        #address-cells = <1>;
+                        #size-cells = <0>;
+                        reg = <1>;
+
+                };
+
+        };
+};
+/*
+&i2c1 {
+	status = "okay";
+	clock-frequency = <400000>;
+};
+*/
+
+&qspi {
+	u-boot,dm-pre-reloc;
+	status = "okay";
+	is-dual = <0>;
+	num-cs = <1>;
+	flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0x0>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <1>;
+		spi-max-frequency = <50000000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		partition@qspi-fsbl-uboot {
+			label = "qspi-fsbl-uboot";
+			reg = <0x0 0x200000>;
+		};
+
+		partition@qspi-user-space{
+			label = "qspi-user-space";
+			reg = <0x200000 0x200000>;
+		};
+
+	};
+};
+
+&sdhci1 {
+	u-boot,dm-pre-reloc;
+	status = "okay";
+};
+
+&gpio0 {
+	u-boot,dm-pre-reloc;
+	status = "okay";
+};
+
+&uart1 {
+	u-boot,dm-pre-reloc;
+	status = "okay";
+};
+
+&uart0 {
+	u-boot,dm-pre-reloc;
+	status = "okay";
+};
+
+&usb0 {
+	status = "okay";
+	dr_mode = "otg";
+	usb-phy = <&usb_phy0>;
+};
+
+&usb1 {
+	status = "okay";
+	dr_mode = "host";
+	usb-phy = <&usb_phy1>;
+};

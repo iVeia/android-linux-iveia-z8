@@ -730,7 +730,7 @@ static int __init iv_io_late_initcall(void)
 }
 //late_initcall(iv_io_late_initcall);
 
-#ifdef CONFIG_HELIOS_INTREPID_SWRESET
+#ifdef CONFIG_HELIOS_SWRESET
 #define IV_Z7E_SWRESET_GPIO 959
 #else
 #define IV_Z7E_SWRESET_GPIO 929

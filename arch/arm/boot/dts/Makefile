@@ -910,6 +910,7 @@ dtb-$(CONFIG_ARCH_ZYNQ) += \
 	zynq-zed.dtb \
 	iveia-atlas-i-z7e.dtb \
 	iveia-helios-z7.dtb \
+	iveia-helios-z7-blnd.dtb \
 	iveia-helios-atp.dtb \
 	zynq-zybo.dtb
 dtb-$(CONFIG_MACH_ARMADA_370) += \
