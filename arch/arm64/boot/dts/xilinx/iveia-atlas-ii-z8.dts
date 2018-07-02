@@ -405,7 +405,7 @@
         };
         };
 
-		iv_mb_00090_iv_mb_0098_usb0: iv_mb_00090_iv_mb_0098_usb0 { //All boards except Atlas-III-Z8
+		iv_mb_00090_iv_mb_0098_iv_mb_00114_usb0: iv_mb_00090_iv_mb_0098_iv_mb_00114_usb0 { //All boards except Atlas-III-Z8
 		//iv_usb0: iv_usb0 {
 			#address-cells = <2>;
 			#size-cells = <2>;
@@ -471,7 +471,7 @@
 			};
 		};
 
-		iv_mb_00090_iv_mb_0098_iv_mb_00108_usb1: iv_mb_00090_iv_mb_0098_iv_mb_00108_usb1 { //All boards except Atlas-III-Z8
+		iv_mb_00090_iv_mb_0098_iv_mb_00108_iv_mb_00114_usb1: iv_mb_00090_iv_mb_0098_iv_mb_00108_iv_mb_00114_usb1 { //All boards except Atlas-III-Z8
 			#address-cells = <2>;
 			#size-cells = <2>;
 			status = "okay";
