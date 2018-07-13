@@ -13,5 +13,37 @@
  */
 
 #include "zynqmp-zcu106-revA.dts"
-#include "zynqmp-zcu106-vcu-pl.dtsi"
+#include "vcu_trd/pcw.dtsi"
 
+
+/* Define configuration */
+#define CONFIG_TPG
+#define CONFIG_CSI
+#define CONFIG_HDMI_RX
+#define CONFIG_HDMI_TX
+#define CONFIG_VCU
+#define CONFIG_APM
+
+#include "vcu_trd/pl.dtsi"
+
+/{
+	chosen {
+		bootargs = "earlycon clk_ignore_unused consoleblank=0 cma=1700M uio_pdrv_genirq.of_id=generic-uio";
+		stdout-path = "serial0:115200n8";
+	};
+
+	memory {
+		device_type = "memory";
+		reg = <0x0 0x0 0x0 0x7ff00000>, <0x00000008 0x00000000 0x0 0x80000000>;
+	};
+};
+
+&i2c1 {
+	i2cswitch@74 {
+	/delete-node/ 	i2c@2;
+	};
+};
+
+&uart1 {
+    status = "disabled";
+};
