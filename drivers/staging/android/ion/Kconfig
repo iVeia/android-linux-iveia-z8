@@ -10,6 +10,14 @@ menuconfig ION
 	  If you're not using Android its probably safe to
 	  say N here.
 
+config ION_SYS_HEAP_DMA32
+	bool "Use 32-bit address for pages in system heap"
+	depends on ION
+	help
+	  This options makes sure that pages allocated for
+	  the system heap have address below 4GB. This is
+	  required by some GPU drivers, for example ARM MALI Utgard.
+
 config ION_TEST
 	tristate "Ion Test Device"
 	depends on ION
