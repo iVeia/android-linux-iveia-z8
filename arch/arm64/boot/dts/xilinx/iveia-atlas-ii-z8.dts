@@ -130,7 +130,7 @@
     	};
 
 // ETH1
-/*	iv_gem1: NOT_iv_io_00110_iv_ethernet@ff0c0000 {
+	iv_gem1: NOT_iv_io_00110_NOT_iv_io_00123_iv_ethernet@ff0c0000 {
 		compatible = "cdns,zynqmp-gem";
 		status = "okay";
                 phy-mode = "gmii";
@@ -145,7 +145,7 @@
 		iommus = <&smmu 0x875>;
 		power-domains = <&pd_eth1>;
 	};
-*/
+
 	merrimack_gem1: iv_io_00110_iv_ethernet@ff0c0000 {
 		compatible = "cdns,zynqmp-gem";
 		status = "okay";
@@ -175,7 +175,7 @@
 
 
 // ETH2
-/*	iv_gem2: iv_ethernet@ff0d0000 {
+	iv_gem2: NOT_iv_io_00123_iv_ethernet@ff0d0000 {
 		compatible = "cdns,zynqmp-gem";
 		status = "okay";
        		phy-mode = "gmii";
@@ -190,7 +190,7 @@
 		iommus = <&smmu 0x876>;
 		power-domains = <&pd_eth2>;
 	};
-*/
+
 // ETH3
 
     iv_bp_00052_mdio0: mdio {
@@ -501,7 +501,7 @@
 			};
 		};
 
-	axi_iic: i2c@80002000 {
+	iv_io_00123_axi_iic: i2c@80002000 {
 		#size-cells = <0>;
 		#address-cells = <1>;
 		compatible = "xlnx,xps-iic-2.00.a";
@@ -759,12 +759,12 @@
         	#gpio-cells = <2>;
 	};
 
-    rtc@68 {
+    iv_io_00123_rtc@68 {
             compatible = "stm,m41t62";
             reg = <0x68>;
     };
 
-	boneisland_gpio: i2c_gpio@20 {
+	boneisland_gpio: iv_io_00123_i2c_gpio@20 {
 		compatible = "ti,tca6408";
 		reg = <0x20>;
 	        gpio-controller;
