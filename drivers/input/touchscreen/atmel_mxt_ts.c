@@ -813,8 +813,8 @@ static void mxt_proc_t9_message(struct mxt_data *data, u8 *message)
 
 		/* Touch active */
 		input_mt_report_slot_state(input_dev, MT_TOOL_FINGER, 1);
-		input_report_abs(input_dev, ABS_MT_POSITION_X, y);
-		input_report_abs(input_dev, ABS_MT_POSITION_Y, x);
+		input_report_abs(input_dev, ABS_MT_POSITION_X, x);
+		input_report_abs(input_dev, ABS_MT_POSITION_Y, y);
 		input_report_abs(input_dev, ABS_MT_PRESSURE, amplitude);
 		input_report_abs(input_dev, ABS_MT_TOUCH_MAJOR, area);
 	} else {

@@ -54,11 +54,11 @@ static struct fb_var_screeninfo iveia_fb_default = {
 	.bits_per_pixel = IV_BYTES_PER_PIXEL * 8,
 //    .transp.offset  = 0,
 //    .transp.length  = 8,
-    .blue.offset    = 0,
+    .blue.offset    = 11,
     .blue.length    = 5,
     .green.offset   = 5,
-    .green.length   = 6,
-    .red.offset     = 11,
+    .green.length   = 8,
+    .red.offset     = 0,
     .red.length     = 5,
 };
 
