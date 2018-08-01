@@ -511,7 +511,20 @@
 		interrupts = < 0 95 4 >;
 		reg = < 0x0 0x80002000 0x0 0x10000 >;
 
-    
+        tsc@4a {
+		    reg = <0x4a>;
+		    compatible = "atmel,maxtouch";
+		    interrupt-parent = <&gic>;
+		    interrupts = <0 94 4>;
+	    };
+
+        tsc@4b {
+		    reg = <0x4b>;
+		    compatible = "atmel,maxtouch";
+		    interrupt-parent = <&gic>;
+		    interrupts = <0 94 4>;
+	    };
+ 
         tsc@4c {
 		    reg = <0x4c>;
 		    compatible = "atmel,maxtouch";
@@ -836,9 +849,11 @@
 //    bus-width = <0x4>;
 //    vmmc-supply = <&lwb_reg>;
 
+    max-frequency = <40000000>;
+
     disable-wp;
 	non-removeable;
-	cap-power-off-card;
+//	cap-power-off-card;
 };
 
 &sdhci0 {
