@@ -777,9 +777,58 @@
             reg = <0x68>;
     };
 
-	boneisland_gpio: iv_io_00123_i2c_gpio@20 {
+	iv_io_00123_switch@71 {
+                compatible = "nxp,pca9547";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0x71>;
+		i2c@0 {
+	        #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <0>;
+			
+        };
+		i2c@1 {
+	        #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <0>;
+			
+        };
+		i2c@2 {
+	        #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <0>;
+			
+        };
+		i2c@3 {
+	        #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <0>;
+			
+        };
+		i2c@4 {
+	        #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <0>;
+			
+        };
+		i2c@5 {
+	        #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <0>;
+			
+        };
+		i2c@6 {
+	        #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <0>;
+			
+        };
+    };
+
+	boneisland_gpio: iv_io_00123_i2c_gpio@21 {
 		compatible = "ti,tca6408";
-		reg = <0x20>;
+		reg = <0x21>;
 	        gpio-controller;
 	        #gpio-cells = <2>;
 	};
