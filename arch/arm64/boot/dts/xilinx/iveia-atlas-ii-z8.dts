@@ -130,7 +130,7 @@
     	};
 
 // ETH1
-	iv_gem1: NOT_iv_io_00110_NOT_iv_io_00123_iv_ethernet@ff0c0000 {
+	iv_gem1: NOT_iv_io_00110_NOT_iv_io_00123_NOT__iv_io_00125_iv_ethernet@ff0c0000 {
 		compatible = "cdns,zynqmp-gem";
 		status = "okay";
                 phy-mode = "gmii";
@@ -175,7 +175,7 @@
 
 
 // ETH2
-	iv_gem2: NOT_iv_io_00123_iv_ethernet@ff0d0000 {
+	iv_gem2: NOT_iv_io_00123_NOT_iv_io_00125_iv_ethernet@ff0d0000 {
 		compatible = "cdns,zynqmp-gem";
 		status = "okay";
        		phy-mode = "gmii";
@@ -471,6 +471,35 @@
 			};
 		};
 
+		iv_io_00125_usb0: iv_io_00125_usb0 {
+			#address-cells = <2>;
+			#size-cells = <2>;
+			status = "okay";
+			compatible = "xlnx,zynqmp-dwc3";
+			reg = <0x0 0xff9d0000 0x0 0x100>;
+			clock-names = "bus_clk", "ref_clk";
+			#stream-id-cells = <1>;
+			iommus = <&smmu 0x860>;
+			power-domains = <&pd_usb0>;
+			ranges;
+			nvmem-cells = <&soc_revision>;
+			nvmem-cell-names = "soc_revision";
+            clocks = <&clkc 32>,  <&clkc 34>;
+
+			boneisland_dwc: dwc3@fe200000 {
+				compatible = "snps,dwc3";
+				status = "okay";
+				reg = <0x0 0xfe200000 0x0 0x40000>;
+				interrupt-parent = <&gic>;
+				interrupts = <0 65 4>, <0 69 4>;
+				snps,quirk-frame-length-adjustment = <0x20>;
+				snps,refclk_fladj;
+
+	            dr_mode = "host";
+			};
+		};
+
+
 		iv_mb_00090_iv_mb_0098_iv_mb_00108_iv_mb_00114_usb1: iv_mb_00090_iv_mb_0098_iv_mb_00108_iv_mb_00114_usb1 { //All boards except Atlas-III-Z8
 			#address-cells = <2>;
 			#size-cells = <2>;
@@ -534,21 +563,75 @@
 
 	};
 
-/*    lwb_reg: reg@1 {
-		compatible = "regulator-fixed";
-		regulator-name = "lwb-wifi";
+    iv_io_00125_axi_iic: i2c@80002000 {
+		#size-cells = <0>;
+		#address-cells = <1>;
+		compatible = "xlnx,xps-iic-2.00.a";
+        clocks = <&clkc 72>;
+        clock-names = "pclk";
+		interrupt-parent = <&gic>;
+		interrupts = < 0 95 4 >;
+		reg = < 0x0 0x80002000 0x0 0x10000 >;
 
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-            		
-		gpio = <&boneisland_gpio 6 GPIO_ACTIVE_HIGH>;
+    	switch@71 {
+            compatible = "nxp,pca9547";
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <0x71>;
+		    i2c@0 {
+	            #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0>;
+			
+            };
+    		i2c@1 {
+    	        #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0>;
+			
+            };
+    		i2c@2 {
+    	        #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0>;
+    			
+            };
+    		i2c@3 {
+    	        #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0>;
+    			
+            };
+    		i2c@4 {
+    	        #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0>;
+    			
+            };
+    		i2c@5 {
+    	        #address-cells = <1>;
+               #size-cells = <0>;
+                reg = <0>;
+			
+            };
+    		i2c@6 {
+    	        #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0>;
+			
+            };
+        };
 
-		enable-active-high;
-    	regulator-boot-on;
-		startup-delay-us = <70000>;
 	};
-*/
 
+    iv_io_00125_gpio-restart {
+	    compatible = "gpio-restart";
+	    gpios = <&gpio 20 GPIO_ACTIVE_LOW>;
+	    priority = <128>;
+	    active-delay = <100>;
+	    inactive-delay = <100>;
+	    wait-delay = <3000>;
+    };
 };
 
 
@@ -777,6 +860,21 @@
             reg = <0x68>;
     };
 
+    iv_io_00125_rtc@68 {
+            compatible = "stm,m41t62";
+            reg = <0x68>;
+    };
+    
+    iv_io_00125_accel@18 {
+            compatible = "st,lis3dh-accel";
+            reg = <0x18>;
+    };
+
+    iv_io_00125_tmp@48 {
+		compatible = "national,lm75";
+		reg = <0x48>;	
+	};
+
 	iv_io_00123_switch@71 {
                 compatible = "nxp,pca9547";
                 #address-cells = <1>;
@@ -845,6 +943,26 @@
  		reg = <0x29>;
  	};
 
+    iv_io_00125_tsc@4a {
+	    reg = <0x4a>;
+	    compatible = "atmel,maxtouch";
+	    interrupt-parent = <&gic>;
+	    interrupts = <0 94 4>;
+    };
+
+    iv_io_00125_tsc@4b {
+	    reg = <0x4b>;
+	    compatible = "atmel,maxtouch";
+	    interrupt-parent = <&gic>;
+	    interrupts = <0 94 4>;
+    };
+ 
+    iv_io_00125_tsc@4c {
+	    reg = <0x4c>;
+	    compatible = "atmel,maxtouch";
+	    interrupt-parent = <&gic>;
+	    interrupts = <0 94 4>;
+    };
 
 };
 
@@ -883,6 +1001,12 @@
  		reg = <0>;	/* CE0 */
  		spi-max-frequency = <500000>;
  	};
+
+	tpm_spi_tis@0{
+		compatible = "tcg,tpm_tis-spi";
+ 		reg = <0>;	/* CE0 */
+ 		spi-max-frequency = <500000>;
+ 	};
 };
 
 &rtc {
@@ -909,6 +1033,11 @@
 	status = "okay";
 	no-1-8-v;
 	xlnx,mio_bank = <0>;
+
+    max-frequency = <40000000>;
+
+    disable-wp;
+	non-removeable;
 };
 
 &uart0 {
