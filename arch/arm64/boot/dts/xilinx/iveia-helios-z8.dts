@@ -988,11 +988,11 @@
             label = "qspi-user-info";
             reg = <0x0fd000 0x1000>;
         };
-        partition@qspi-user-info{
+        partition@qspi-io-board-info{
             label = "qspi-io-board-info";
             reg = <0x0fe000 0x1000>;
         };
-        partition@qspi-board-info{
+        partition@qspi-mb-board-info{
             label = "qspi-mb-board-info";
             reg = <0x0ff000 0x1000>;
         }; 
