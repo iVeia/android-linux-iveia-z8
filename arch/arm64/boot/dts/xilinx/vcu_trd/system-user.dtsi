@@ -1,0 +1,12 @@
+#include "system-conf.dtsi"
+
+/* Define configuration */
+#define CONFIG_TPG
+#define CONFIG_CSI
+#define CONFIG_HDMI_RX
+#define CONFIG_HDMI_TX
+#define CONFIG_VCU
+#define CONFIG_APM
+
+/* Includes */
+#include "pl.dtsi"

@@ -1,0 +1,102 @@
+
+&amba {
+
+	hdmi_rx_ss: hdmi_rx_ss@a0000000 {
+		compatible = "xlnx,v-hdmi-rx-ss-3.1";
+		reg = <0x0 0xa0000000 0x0 0x10000>;
+		reg-names = "hdmi-rxss";
+		interrupt-parent = <&gic>;
+		interrupts = <0 91 4>;
+		interrupt-names = "hdmirx";
+		clocks = <&vid_s_axi_clk>, <&vid_stream_clk>;
+		clock-names = "axi-lite", "video";
+		phy-names = "hdmi-phy0", "hdmi-phy1", "hdmi-phy2";
+		phys = <&vphy_lane0 0 1 1 0>, <&vphy_lane1 0 1 1 0>, <&vphy_lane2 0 1 1 0>;
+
+		xlnx,input-pixels-per-clock = <0x2>;
+		xlnx,edid-ram-size = <0x100>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			port@0 {
+				reg = <0>;
+
+				/* HDMI RX SS -> FB-WR */
+				hdmi_rx_ss_out: endpoint {
+					remote-endpoint = <&vpss_scaler_in>;
+				};
+			};
+		};
+	};
+
+	scaler_2: scaler@a0080000 {
+		compatible = "xlnx,v-vpss-scaler";
+		reg = <0x0 0xa0080000 0x0 0x40000>;
+		clocks = <&vid_stream_clk>;
+		xlnx,num-hori-taps = <0x8>;
+		xlnx,num-vert-taps = <0x8>;
+		xlnx,max-num-phases = <0x40>;
+		xlnx,max-lines = <0x870>;
+		xlnx,max-pixels = <0xf00>;
+		xlnx,pix-per-clk = <0x2>;
+		reset-gpios = <&gpio 78 1>;
+
+		ports {
+			#address-cells = <0x1>;
+			#size-cells = <0x0>;
+
+			port@0 {
+				reg = <0x0>;
+				xlnx,video-format = <0x2>;
+				xlnx,video-width = <0x8>;
+
+				vpss_scaler_in:endpoint {
+					remote-endpoint = <&hdmi_rx_ss_out>;
+				};
+			};
+
+			port@1 {
+				reg = <0x1>;
+				xlnx,video-format = <0x3>;
+				xlnx,video-width = <0x8>;
+
+				vpss_scaler_out:endpoint {
+					remote-endpoint = <&vcap_hdmi_in_1>;
+				};
+			};
+		};
+	};
+
+	hdmi_frmbuf_wr_1: frmbuf_wr@a0010000 {
+		compatible = "xlnx,axi-frmbuf-wr-v2";
+		#dma-cells = <1>;
+		interrupt-parent = <&gic>;
+		interrupts = <0 90 4>;
+		reg = <0x0 0xa0010000 0x0 0x10000>;
+		reset-gpios = <&gpio 93 1>;
+		xlnx,dma-addr-width = <32>;
+		xlnx,vid-formats = "bgr888","xbgr8888","xrgb8888","vuy888","xvuy8888","y8","yuyv","uyvy","nv16","nv12";
+	};
+
+	vcap_hdmi_1 {
+		compatible = "xlnx,video";
+		dmas = <&hdmi_frmbuf_wr_1 0>;
+		dma-names = "port0";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				direction = "input";
+
+				/* HDMIRXSS -> VCAP_HDMI */
+				vcap_hdmi_in_1: endpoint {
+					remote-endpoint = <&vpss_scaler_out>;
+				};
+			};
+		};
+	};
+};

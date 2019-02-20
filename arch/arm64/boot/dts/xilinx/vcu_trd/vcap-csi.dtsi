@@ -1,0 +1,235 @@
+
+&amba {
+
+	sensor_iic_0: i2c@a0051000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		status = "okay";
+		compatible = "xlnx,xps-iic-2.00.a";
+		interrupt-parent = <&gic>;
+		interrupts = <0 107 4>;
+		reg = <0x0 0xa0051000 0x0 0x1000>;
+		clocks = <&vid_s_axi_clk>;
+	};
+
+	csiss_1: csiss@a00f0000 {
+		compatible = "xlnx,mipi-csi2-rx-subsystem-2.0";
+		reg = <0x0 0xa00f0000 0x0 0x10000>;
+		clocks = <&vid_stream_clk>;
+		interrupt-parent = <&gic>;
+		interrupts = <0 105 4>;
+
+		xlnx,max-lanes = <0x4>;
+		xlnx,en-active-lanes;
+		xlnx,vc = <0x4>;
+		xlnx,csi-pxl-format = "RAW8";
+		xlnx,vfb;
+		xlnx,ppc = <0x4>;
+		xlnx,axis-tdata-width = <0x20>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				xlnx,video-format = <12>;
+				xlnx,video-width = <8>;
+				xlnx,cfa-pattern = "rggb";
+
+				csiss_out: endpoint {
+					remote-endpoint = <&demosaic_in>;
+				};
+			};
+			port@1 {
+				reg = <1>;
+
+				xlnx,video-format = <12>;
+				xlnx,video-width = <8>;
+				xlnx,cfa-pattern = "rggb";
+
+				csiss_in: endpoint {
+					data-lanes = <1 2 3 4>;
+					remote-endpoint = <&sensor_out>;
+				};
+			};
+		};
+	};
+
+	v_demosaic_0: v_demosaic@a0250000 {
+		compatible = "xlnx,v-demosaic";
+		reg = <0x0 0xa0250000 0x0 0x10000>;
+		clocks = <&vid_stream_clk>;
+
+		reset-gpios = <&gpio 85 1>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				xlnx,video-width = <8>;
+				xlnx,cfa-pattern = "rggb";
+
+				demosaic_in: endpoint {
+					remote-endpoint = <&csiss_out>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				xlnx,video-width = <8>;
+
+				demosaic_out: endpoint {
+					remote-endpoint = <&gamma_in>;
+				};
+			};
+		};
+	};
+
+	gamma_1: v_gamma@a0270000 {
+		compatible = "xlnx,v-gamma-lut";
+		reg = <0x0 0xa0270000 0x0 0x10000>;
+		clocks = <&vid_stream_clk>;
+
+		reset-gpios = <&gpio 86 1>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				xlnx,video-width = <8>;
+
+				gamma_in: endpoint {
+					remote-endpoint = <&demosaic_out>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				xlnx,video-width = <8>;
+
+				gamma_out: endpoint {
+					remote-endpoint = <&csc_in>;
+				};
+			};
+		};
+	};
+
+	csc_1: csc@a0240000 {
+		compatible = "xlnx,v-vpss-csc";
+		reg = <0x0 0xa0240000 0x0 0x10000>;
+		clocks = <&vid_stream_clk>;
+
+		reset-gpios = <&gpio 84 1>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				xlnx,video-format = <2>;
+				xlnx,video-width = <8>;
+
+				csc_in: endpoint {
+					remote-endpoint = <&gamma_out>;
+				};
+			};
+			port@1 {
+				reg = <1>;
+
+				xlnx,video-format = <2>;
+				xlnx,video-width = <8>;
+
+				csc_out: endpoint {
+					remote-endpoint = <&scaler_in>;
+				};
+			};
+		};
+	};
+
+	scaler_1: scaler@a0200000 {
+		compatible = "xlnx,v-vpss-scaler";
+		reg = <0x0 0xa0200000 0x0 0x40000>;
+		clocks = <&vid_stream_clk>;
+
+		xlnx,num-hori-taps = <8>;
+		xlnx,num-vert-taps = <8>;
+		xlnx,max-num-phases = <64>;
+		xlnx,max-lines = <2160>;
+		xlnx,max-pixels = <3840>;
+		xlnx,pix-per-clk = <2>;
+
+		reset-gpios = <&gpio 82 1>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				xlnx,video-format = <2>;
+				xlnx,video-width = <8>;
+
+				scaler_in: endpoint {
+					remote-endpoint = <&csc_out>;
+				};
+			};
+			port@1 {
+				reg = <1>;
+
+				xlnx,video-format = <0>;
+				xlnx,video-width = <8>;
+
+				scaler_out: endpoint {
+					remote-endpoint = <&vcap_csi_in>;
+				};
+			};
+		};
+	};
+
+	fb_wr_csi: fb_wr@a0260000 {
+		compatible = "xlnx,axi-frmbuf-wr-v2";
+		reg = <0x0 0xa0260000 0x0 0x10000>;
+		#dma-cells = <1>;
+		interrupt-parent = <&gic>;
+		interrupts = <0 106 4>;
+		clocks = <&vid_stream_clk>;
+		clock-names = "axis";
+		xlnx,vid-formats = "yuyv", "nv12", "y8", "uyvy";
+		xlnx,dma-addr-width = <32>;
+
+		reset-gpios = <&gpio 80 1>;
+	};
+
+	vcap_csi {
+		compatible = "xlnx,video";
+		dmas = <&fb_wr_csi 0>;
+		dma-names = "port0";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				direction = "input";
+
+				vcap_csi_in: endpoint {
+					remote-endpoint = <&scaler_out>;
+				};
+			};
+		};
+	};
+};

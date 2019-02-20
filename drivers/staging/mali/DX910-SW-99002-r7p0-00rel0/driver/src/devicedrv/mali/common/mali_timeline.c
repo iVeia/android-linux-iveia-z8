@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2013-2016 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
  * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -1632,7 +1632,7 @@ void mali_timeline_debug_print_tracker(struct mali_timeline_tracker *tracker, _m
 			MALI_DEBUG_PRINT(2, ("TL:  %s %u %c  fd:%d  fence:(0x%08X)  job:(0x%08X)\n",
 					    tracker_type, tracker->point, state_char,
 					    tracker->fence.sync_fd, (unsigned int)(uintptr_t)(tracker->sync_fence), (unsigned int)(uintptr_t)(tracker->job)));
-			
+
 	}
 #else
 	if (0 != tracker->trigger_ref_count) {
@@ -1659,7 +1659,7 @@ void mali_timeline_debug_print_tracker(struct mali_timeline_tracker *tracker, _m
 			MALI_DEBUG_PRINT(2, ("TL:  %s %u %c  job:(0x%08X)\n",
 					    tracker_type, tracker->point, state_char,
 					    (unsigned int)(uintptr_t)(tracker->job)));
-			
+
 	}
 #endif
 }
@@ -1756,7 +1756,7 @@ void mali_timeline_debug_print_system(struct mali_timeline_system *system, _mali
 		else
 			MALI_DEBUG_PRINT(2, ("TL: Timeline %s: oldest (%u) next(%u)\n",
 					    timeline_id_to_string((enum mali_timeline_id)i), timeline->point_oldest, timeline->point_next));
-		
+
 		mali_timeline_debug_print_timeline(timeline, print_ctx);
 		num_printed++;
 	}

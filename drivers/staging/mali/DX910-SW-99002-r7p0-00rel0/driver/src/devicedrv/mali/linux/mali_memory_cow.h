@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2013-2016 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
  * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -45,4 +45,3 @@ int mali_mem_cow_mali_map(mali_mem_backend *mem_bkend, u32 range_start, u32 rang
 u32 mali_mem_cow_release(mali_mem_backend *mem_bkend, mali_bool is_mali_mapped);
 _mali_osk_errcode_t mali_mem_cow_allocate_on_demand(mali_mem_backend *mem_bkend, u32 offset_page);
 #endif
-

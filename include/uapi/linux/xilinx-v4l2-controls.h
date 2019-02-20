@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
  * Xilinx Controls Header
  *
@@ -71,6 +72,8 @@
 #define V4L2_CID_XILINX_TPG_NOISE_GAIN		(V4L2_CID_XILINX_TPG + 17)
 /* Foreground pattern (HLS)*/
 #define V4L2_CID_XILINX_TPG_HLS_FG_PATTERN     (V4L2_CID_XILINX_TPG + 18)
+/* pixels per clock control */
+#define V4L2_CID_XILINX_PPC			(V4L2_CID_XILINX_TPG + 19)
 
 /*
  * Xilinx CRESAMPLE Video IP
@@ -195,5 +198,10 @@
 #define V4L2_CID_XILINX_SDIRX_EDH_ERRCNT	(V4L2_CID_XILINX_SDIRX + 7)
 /* Get EDH status control */
 #define V4L2_CID_XILINX_SDIRX_EDH_STATUS	(V4L2_CID_XILINX_SDIRX + 8)
-
+/* Get Transport Interlaced status */
+#define V4L2_CID_XILINX_SDIRX_TS_IS_INTERLACED	(V4L2_CID_XILINX_SDIRX + 9)
+/* Get Active Streams count */
+#define V4L2_CID_XILINX_SDIRX_ACTIVE_STREAMS	(V4L2_CID_XILINX_SDIRX + 10)
+/* Is Mode 3GB */
+#define V4L2_CID_XILINX_SDIRX_IS_3GB		(V4L2_CID_XILINX_SDIRX + 11)
 #endif /* __UAPI_XILINX_V4L2_CONTROLS_H__ */

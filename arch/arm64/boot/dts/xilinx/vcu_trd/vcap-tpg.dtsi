@@ -1,0 +1,63 @@
+&amba {
+	xilinx_vtc:vtc@a00d0000 {
+		compatible = "xlnx,v-tc-6.1";
+		reg = <0x0 0xa00d0000 0x0 0x10000>;
+		clocks = <&vid_stream_clk 0>;
+		xlnx,generator;
+	};
+
+	tpg@a00e0000 {
+		compatible = "xlnx,v-tpg-7.0";
+		reg = <0x0 0xa00e0000 0x0 0x10000>;
+		clocks = <&vid_stream_clk>;
+		xlnx,vtc = <&xilinx_vtc>;
+		reset-gpios = <&gpio 96 1>;
+
+		ports {
+			#address-cells = <0x1>;
+			#size-cells = <0x0>;
+
+			port@0 {
+				reg = <0x0>;
+				xlnx,video-format = <0x3>;
+				xlnx,video-width = <0x8>;
+
+				tpg_input:endpoint {
+					remote-endpoint = <&vcap_dev>;
+				};
+			};
+		};
+	};
+
+	tpg_frmbuf_wr_0: v_frmbuf_wr@a00c0000 {
+		compatible = "xlnx,axi-frmbuf-wr-v2";
+		#dma-cells = <1>;
+		interrupt-parent = <&gic>;
+		interrupts = <0 104 4>;
+		reg = <0x0 0xa00c0000 0x0 0x10000>;
+		reset-gpios = <&gpio 94 1>;
+		xlnx,dma-addr-width = <32>;
+		xlnx,vid-formats = "bgr888","xbgr8888","xrgb8888","vuy888","xvuy8888","y8","yuyv","uyvy","nv16","nv12";
+	};
+
+	vcap_tpg {
+		compatible = "xlnx,video";
+		dmas = <&tpg_frmbuf_wr_0 0x0>;
+		dma-names = "port0";
+
+		ports {
+			#address-cells = <0x1>;
+			#size-cells = <0x0>;
+
+			port@0 {
+				reg = <0x0>;
+				direction = "input";
+
+				vcap_dev:endpoint {
+					remote-endpoint = <&tpg_input>;
+				};
+			};
+		};
+	};
+
+};

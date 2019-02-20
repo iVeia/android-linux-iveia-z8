@@ -1,0 +1,59 @@
+&amba {
+
+   dummy_2{
+            compatible = "xlnx,dummy";
+            #address-cells = <0x1>;
+            #size-cells = <0x0>;
+			clocks = <&vid_stream_clk>;
+			reset-gpios = <0x18 0x5c 0x1>;
+			reg = <0x0 0xa02d0000 0x0 0x10000>;
+            
+			ports {
+                #address-cells = <0x1>;
+                #size-cells = <0x0>;
+
+                port@0 {
+                    reg = <0x0>;
+                    xlnx,video-format = <0x0>;
+                    xlnx,video-width = <0x8>;
+
+                    hdmi_input_3:endpoint {
+                        remote-endpoint = <&vcap_dev_hdmi_3>;
+                    };
+                };
+            };
+        };
+
+	hdmi_frmbuf_wr_3: v_frmbuf_wr@a02c0000 {
+		compatible = "xlnx,axi-frmbuf-wr-v2";
+		#dma-cells = <1>;
+		interrupt-parent = <&gic>;
+		interrupts = <0 110 4>;
+		reg = <0x0 0xa02c0000 0x0 0x10000>;
+		reset-gpios = <&gpio 99 1>;
+		xlnx,dma-addr-width = <32>;
+		xlnx,vid-formats = "bgr888","xbgr8888","xrgb8888","vuy888","xvuy8888","y8","yuyv","uyvy","nv16","nv12";
+	};
+
+
+	vcap_hdmi_3 {
+		compatible = "xlnx,video";
+		dmas = <&hdmi_frmbuf_wr_3 0x0>;
+		dma-names = "port0";
+
+		ports {
+			#address-cells = <0x1>;
+			#size-cells = <0x0>;
+
+			port@0 {
+				reg = <0x0>;
+				direction = "input";
+
+				vcap_dev_hdmi_3:endpoint {
+					remote-endpoint = <&hdmi_input_3>;
+				};
+			};
+		};
+	};
+
+};

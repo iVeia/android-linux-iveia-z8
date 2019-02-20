@@ -1,0 +1,86 @@
+#ifdef CONFIG_HDMI_RX
+#include "vcap-hdmi_1.dtsi"
+#include "vcap-hdmi_2.dtsi"
+#include "vcap-hdmi_3.dtsi"
+#endif
+
+#ifdef CONFIG_TPG
+#include "vcap-tpg.dtsi"
+#endif
+
+#ifdef CONFIG_CSI
+#include "vcap-csi.dtsi"
+#include "li-imx274mipi-fmc.dtsi"
+#endif
+
+#ifdef CONFIG_HDMI_TX
+#include "hdmi-misc.dtsi"
+#include "drm-hdmi.dtsi"
+#endif
+
+#ifdef CONFIG_VCU
+#include "vcu.dtsi"
+#endif
+
+#ifdef CONFIG_APM
+#include "apm.dtsi"
+#endif
+
+#ifdef CONFIG_DM1
+#include "vcap-hdmi_1.dtsi"
+#endif
+
+&amba {
+	vid_stream_clk: vid_stream_clk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <300000000>;
+	};
+
+	vid_s_axi_clk: vid_s_axi_clk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <99990000>;
+	};
+
+#if defined(CONFIG_HDMI_RX) || defined(CONFIG_HDMI_TX) || defined(CONFIG_DM1)
+
+	vid_phy_controller: vid_phy_controller@a0060000 {
+		compatible = "xlnx,vid-phy-controller-2.2";
+		interrupt-parent = <&gic>;
+		interrupts = <0 92 4>;
+		reg = <0x0 0xa0060000 0x0 0x10000>;
+		clocks = <&vid_s_axi_clk>, <&si570_2>;
+		clock-names = "axi-lite", "dru-clk";
+
+		xlnx,input-pixels-per-clock = <0x2>;
+		xlnx,nidru = <0x1>;
+		xlnx,nidru-refclk-sel = <0x5>;
+		xlnx,rx-no-of-channels = <0x3>;
+		xlnx,rx-pll-selection = <0x0>;
+		xlnx,rx-protocol = <0x1>;
+		xlnx,rx-refclk-sel = <0x1>;
+		xlnx,tx-no-of-channels = <0x3>;
+		xlnx,tx-pll-selection = <0x6>;
+		xlnx,tx-protocol = <0x1>;
+		xlnx,tx-refclk-sel = <0x0>;
+		xlnx,hdmi-fast-switch = <0x1>;
+		xlnx,transceiver-type = <0x5>;
+		xlnx,tx-buffer-bypass = <0x1>;
+		xlnx,transceiver-width = <0x2>;
+
+		vphy_lane0: vphy_lane@0 {
+			#phy-cells = <4>;
+		};
+		vphy_lane1: vphy_lane@1 {
+			#phy-cells = <4>;
+		};
+		vphy_lane2: vphy_lane@2 {
+			#phy-cells = <4>;
+		};
+		vphy_lane3: vphy_lane@3 {
+			#phy-cells = <4>;
+		};
+	};
+#endif
+};

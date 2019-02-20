@@ -6,10 +6,7 @@
  * Michal Simek <michal.simek@xilinx.com>
  * Nathalie Chan King Choy <nathalie@xilinx.com>
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /dts-v1/;
@@ -107,12 +104,6 @@
 			gpios = <&gpio 25 GPIO_ACTIVE_HIGH>;
 			default-state = "on";
 		};
-
-		bt_power {
-			label = "bt_power";
-			gpios = <&gpio 8 GPIO_ACTIVE_HIGH>;
-			default-state = "on";
-		};
 	};
 
 	ltc2954: ltc2954 { /* U7 */
@@ -144,11 +135,6 @@
 
 &dcc {
 	status = "okay";
-};
-
-&pmufw {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_pmu_default>;
 };
 
 &gpio {
@@ -418,40 +404,26 @@
 		};
 	};
 
-	pinctrl_pmu_default: pmu-default {
-		mux {
-			groups = "pmu0_8_grp";
-			function = "pmu0";
-		};
-
-		conf {
-			groups = "pmu0_8_grp";
-			bias-pull-up;
-			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
-		};
-	};
-
 	pinctrl_sdhci0_default: sdhci0-default {
 		mux {
-			groups = "sdio0_4bit_0_0_grp";
+			groups = "sdio0_3_grp";
 			function = "sdio0";
 		};
 
 		conf {
-			groups = "sdio0_4bit_0_0_grp";
+			groups = "sdio0_3_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
 			io-standard = <IO_STANDARD_LVCMOS18>;
 			bias-disable;
 		};
 
 		mux-cd {
-			groups = "sdio0_0_cd_grp";
+			groups = "sdio0_cd_0_grp";
 			function = "sdio0_cd";
 		};
 
 		conf-cd {
-			groups = "sdio0_0_cd_grp";
+			groups = "sdio0_cd_0_grp";
 			bias-high-impedance;
 			bias-pull-up;
 			slew-rate = <SLEW_RATE_SLOW>;
@@ -461,12 +433,12 @@
 
 	pinctrl_sdhci1_default: sdhci1-default {
 		mux {
-			groups = "sdio1_4bit_0_1_grp";
+			groups = "sdio1_2_grp";
 			function = "sdio1";
 		};
 
 		conf {
-			groups = "sdio1_4bit_0_1_grp";
+			groups = "sdio1_2_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
 			io-standard = <IO_STANDARD_LVCMOS18>;
 			bias-disable;
@@ -487,12 +459,12 @@
 		};
 
 		mux-cs {
-			groups = "spi0_3_ss0_grp";
+			groups = "spi0_ss_9_grp";
 			function = "spi0_ss";
 		};
 
 		conf-cs {
-			groups = "spi0_3_ss0_grp";
+			groups = "spi0_ss_9_grp";
 			bias-disable;
 		};
 
@@ -512,12 +484,12 @@
 		};
 
 		mux-cs {
-			groups = "spi1_0_ss0_grp";
+			groups = "spi1_ss_0_grp";
 			function = "spi1_ss";
 		};
 
 		conf-cs {
-			groups = "spi1_0_ss0_grp";
+			groups = "spi1_ss_0_grp";
 			bias-disable;
 		};
 
@@ -674,6 +646,11 @@
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart0_default>;
+	bluetooth {
+		compatible = "ti,wl1831-st";
+		enable-gpios = <&gpio 8 GPIO_ACTIVE_HIGH>;
+	};
+
 };
 
 &uart1 {
@@ -717,34 +694,26 @@
 	status = "okay";
 };
 
-&xilinx_drm {
-	status = "okay";
-};
-
-&xlnx_dp {
+&zynqmp_dpsub {
 	status = "okay";
 	phy-names = "dp-phy0", "dp-phy1";
 	phys = <&lane1 PHY_TYPE_DP 0 1 27000000>,
 	       <&lane0 PHY_TYPE_DP 1 1 27000000>;
 };
 
-&xlnx_dp_sub {
+&zynqmp_dp_snd_pcm0 {
 	status = "okay";
 };
 
-&xlnx_dp_snd_pcm0 {
+&zynqmp_dp_snd_pcm1 {
 	status = "okay";
 };
 
-&xlnx_dp_snd_pcm1 {
+&zynqmp_dp_snd_card0 {
 	status = "okay";
 };
 
-&xlnx_dp_snd_card {
-	status = "okay";
-};
-
-&xlnx_dp_snd_codec0 {
+&zynqmp_dp_snd_codec0 {
 	status = "okay";
 };
 
