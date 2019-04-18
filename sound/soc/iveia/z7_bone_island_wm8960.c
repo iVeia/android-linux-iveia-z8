@@ -1,16 +1,29 @@
 /*
- *  Copyright (C) 2012-2013, Analog Devices Inc.
- *	Author: Lars-Peter Clausen <lars@metafoo.de>
- *
- *  This program is free software; you can redistribute it and/or modify it
- *  under  the terms of the GNU General  Public License as published by the
- *  Free Software Foundation;  either version 2 of the License, or (at your
- *  option) any later version.
- *
- *  You should have received a copy of the GNU General Public License along
- *  with this program; if not, write to the Free Software Foundation, Inc.,
- *  675 Mass Ave, Cambridge, MA 02139, USA.
- *
+
+Hacked up version of z7e_wm8960.c to get Audio to work on Atlas-Bone Island
+
+To Playback::::
+
+/etc/iveia/i2crw -d /dev/i2c-0 -a 21 03 fb
+amixer sset Headphone,0 100%
+amixer sset Playback,0 100% unmute
+amixer sset Left\ Output\ Mixer\ PCM,0 on && amixer sset Right\ Output\ Mixer\ PCM,0 on
+aplay /usr/share/sounds/alsa/Front_Center.wav 
+
+
+To Record::::
+amixer sset Left\ Boost\ Mixer\ LINPUT1,0 on
+amixer sset Left\ Boost\ Mixer\ LINPUT2,0 on
+amixer sset Left\ Boost\ Mixer\ LINPUT3,0 off
+
+amixer sset Left\ Input\ Boost\ Mixer\ LINPUT1,0 0
+amixer sset Left\ Input\ Mixer\ Boost,0 on
+
+amixer sset Left\ Output\ Mixer\ PCM,0 on
+amixer -c 0 cset name='Capture Volume' 100%,100%
+amixer -c 0 cset name='Capture Switch' on,on
+amixer -c 0 cset name='ADC Data Output Select' 3
+arecord -f S16_LE -d 10 audio.wav
  */
 
 #include <linux/module.h>
@@ -24,7 +37,7 @@
 #include <sound/soc.h>
 #include "../codecs/wm8960.h"
 
-static const struct snd_soc_dapm_widget z7e_wm8960_widgets[] = {
+static const struct snd_soc_dapm_widget z7_bone_island_wm8960_widgets[] = {
     SND_SOC_DAPM_MIC(    "Mic Jack",            NULL ),
     SND_SOC_DAPM_LINE(    "Line Input 3 (FM)",NULL ),
     SND_SOC_DAPM_HP(    "Headphone Jack",    NULL ),
@@ -32,7 +45,7 @@ static const struct snd_soc_dapm_widget z7e_wm8960_widgets[] = {
     SND_SOC_DAPM_SPK(    "Speaker_R",        NULL ),
 };
         
-static const struct snd_soc_dapm_route z7e_wm8960_routes[] = {
+static const struct snd_soc_dapm_route z7_bone_island_wm8960_routes[] = {
     { "Headphone Jack",    NULL,    "HP_L"        },
     { "Headphone Jack",    NULL,     "HP_R"        },
     { "Speaker_L",        NULL,     "SPK_LP"    }, 
@@ -44,14 +57,15 @@ static const struct snd_soc_dapm_route z7e_wm8960_routes[] = {
 };
 
 #define AUDIO_FORMAT (SND_SOC_DAIFMT_I2S | \
-	SND_SOC_DAIFMT_CBS_CFS | SND_SOC_DAIFMT_IB_NF)
+	SND_SOC_DAIFMT_CBS_CFS | SND_SOC_DAIFMT_NB_NF)
 
-static int z7e_wm8960_hw_params(struct snd_pcm_substream *substream,
+static int z7_bone_island_wm8960_hw_params(struct snd_pcm_substream *substream,
 	struct snd_pcm_hw_params *params)
 {
     struct snd_soc_pcm_runtime *rtd = substream->private_data;
     struct snd_soc_dai *codec_dai = rtd->codec_dai;
     struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
+    struct snd_soc_codec *codec = rtd->codec;
     unsigned int rate = params_rate(params);
     snd_pcm_format_t fmt = params_format( params );
     unsigned sysclk;
@@ -137,15 +151,26 @@ static int z7e_wm8960_hw_params(struct snd_pcm_substream *substream,
     //ret = snd_soc_dai_set_pll(codec_dai, 0, 0, 12000000, sysclk);
     ret = snd_soc_dai_set_pll(codec_dai, 0, 0, 8000000, sysclk);
     printk("-%s()\n", __FUNCTION__ );
+
+    //NOT SURE HOW TO DO THESE WITH MAPPINGS, so DO IT HERE
+    //TURN ON LEFT ADC
+    snd_soc_update_bits(codec, WM8960_POWER1, 0x008, 0x008);
+
+    //Left input PGA Enable
+    snd_soc_update_bits(codec, WM8960_POWER3, 0x020, 0x020);
+
+    //TURN ON LEFT Analogue Input
+    snd_soc_update_bits(codec, WM8960_POWER1, 0x020, 0x020);
+
     return 0;
 
 }
 
-static struct snd_soc_ops z7e_wm8960_ops = {
-	.hw_params = z7e_wm8960_hw_params,
+static struct snd_soc_ops z7_bone_island_wm8960_ops = {
+	.hw_params = z7_bone_island_wm8960_hw_params,
 };
 
-static int z7e_wm8960_init(struct snd_soc_pcm_runtime *rtd)
+static int z7_bone_island_wm8960_init(struct snd_soc_pcm_runtime *rtd)
 {
     struct snd_soc_codec *codec = rtd->codec;
     struct snd_soc_dapm_context *dapm = &rtd->card->dapm;
@@ -155,10 +180,10 @@ static int z7e_wm8960_init(struct snd_soc_pcm_runtime *rtd)
     snd_soc_dapm_nc_pin(dapm, "RINPUT2");
     snd_soc_dapm_nc_pin(dapm, "OUT3");
             
-    snd_soc_dapm_new_controls( dapm, z7e_wm8960_dapm_capture_widgets, ARRAY_SIZE( z7e_wm8960_dapm_capture_widgets ) );
-    snd_soc_dapm_new_controls( dapm, z7e_wm8960_dapm_playback_widgets, ARRAY_SIZE( z7e_wm8960_dapm_playback_widgets ) );
+    snd_soc_dapm_new_controls( dapm, z7_bone_island_wm8960_dapm_capture_widgets, ARRAY_SIZE( z7_bone_island_wm8960_dapm_capture_widgets ) );
+    snd_soc_dapm_new_controls( dapm, z7_bone_island_wm8960_dapm_playback_widgets, ARRAY_SIZE( z7_bone_island_wm8960_dapm_playback_widgets ) );
         
-    snd_soc_dapm_add_routes( dapm, z7e_wm8960_audio_map, ARRAY_SIZE( z7e_wm8960_audio_map ) );
+    snd_soc_dapm_add_routes( dapm, z7_bone_island_wm8960_audio_map, ARRAY_SIZE( z7_bone_island_wm8960_audio_map ) );
         
     snd_soc_dapm_enable_pin(dapm, "Headphone Jack");
     snd_soc_dapm_enable_pin(dapm, "Mic Jack");
@@ -201,38 +226,47 @@ static int z7e_wm8960_init(struct snd_soc_pcm_runtime *rtd)
     snd_soc_update_bits(codec, WM8960_POWER3, 0x1FF, 0x03C);
 
 
+//i2c wlf_mw 1a 19 0e8;
+//i2c wlf_mw 1a 2f 02c;
+
+    snd_soc_update_bits(codec, WM8960_POWER1, 0x1FF, 0x0e8);
+    snd_soc_update_bits(codec, WM8960_POWER3, 0x1FF, 0x02c);
+
+	snd_soc_dapm_force_enable_pin(dapm, "MICB");
+
+
     //printk (KERN_ERR "~-~- IVEIA SETUP END -~-~\n");
 
     return 0;
 }
 
-static struct snd_soc_dai_link z7e_wm8960_dai_link = {
+static struct snd_soc_dai_link z7_bone_island_wm8960_dai_link = {
 	.name = "wm8960",
 	.stream_name = "wm8960",
 	.codec_dai_name = "wm8960-hifi",
 	.dai_fmt = SND_SOC_DAIFMT_I2S |
-			SND_SOC_DAIFMT_IB_NF |
+			SND_SOC_DAIFMT_NB_NF |
 			SND_SOC_DAIFMT_CBS_CFS,
-	.ops = &z7e_wm8960_ops,
-	.init = z7e_wm8960_init,
+	.ops = &z7_bone_island_wm8960_ops,
+	.init = z7_bone_island_wm8960_init,
 };
 
-static struct snd_soc_card z7e_wm8960_card = {
+static struct snd_soc_card z7_bone_island_wm8960_card = {
 	.name = "iVeia Card",
 	.owner = THIS_MODULE,
-	.dai_link = &z7e_wm8960_dai_link,
+	.dai_link = &z7_bone_island_wm8960_dai_link,
 	.num_links = 1,
-	.dapm_widgets = z7e_wm8960_widgets,
-       .num_dapm_widgets = ARRAY_SIZE(z7e_wm8960_widgets),
-       .dapm_routes = z7e_wm8960_routes,
-       .num_dapm_routes = ARRAY_SIZE(z7e_wm8960_routes),
+	.dapm_widgets = z7_bone_island_wm8960_widgets,
+       .num_dapm_widgets = ARRAY_SIZE(z7_bone_island_wm8960_widgets),
+       .dapm_routes = z7_bone_island_wm8960_routes,
+       .num_dapm_routes = ARRAY_SIZE(z7_bone_island_wm8960_routes),
        .fully_routed = true,
 };
 
-static int z7e_wm8960_probe(struct platform_device *pdev)
+static int z7_bone_island_wm8960_probe(struct platform_device *pdev)
 {
 	int ret;
-	struct snd_soc_card *card = &z7e_wm8960_card;
+	struct snd_soc_card *card = &z7_bone_island_wm8960_card;
 	struct device_node *of_node = pdev->dev.of_node;
 
 	if (!of_node)
@@ -240,12 +274,12 @@ static int z7e_wm8960_probe(struct platform_device *pdev)
 
 	card->dev = &pdev->dev;
 
-	z7e_wm8960_dai_link.codec_of_node = of_parse_phandle(of_node, "audio-codec", 0);
-	z7e_wm8960_dai_link.cpu_of_node = of_parse_phandle(of_node, "cpu-dai", 0);
-	z7e_wm8960_dai_link.platform_of_node = z7e_wm8960_dai_link.cpu_of_node;
+	z7_bone_island_wm8960_dai_link.codec_of_node = of_parse_phandle(of_node, "audio-codec", 0);
+	z7_bone_island_wm8960_dai_link.cpu_of_node = of_parse_phandle(of_node, "cpu-dai", 0);
+	z7_bone_island_wm8960_dai_link.platform_of_node = z7_bone_island_wm8960_dai_link.cpu_of_node;
 
-	if (!z7e_wm8960_dai_link.codec_of_node ||
-		!z7e_wm8960_dai_link.cpu_of_node)
+	if (!z7_bone_island_wm8960_dai_link.codec_of_node ||
+		!z7_bone_island_wm8960_dai_link.cpu_of_node)
 		return -ENXIO;
 
 	ret = snd_soc_register_card(card);
@@ -257,7 +291,7 @@ static int z7e_wm8960_probe(struct platform_device *pdev)
 	return 0;
 }
 
-static int z7e_wm8960_remove(struct platform_device *pdev)
+static int z7_bone_island_wm8960_remove(struct platform_device *pdev)
 {
 	struct snd_soc_card *card = platform_get_drvdata(pdev);
 
@@ -266,22 +300,22 @@ static int z7e_wm8960_remove(struct platform_device *pdev)
 	return 0;
 }
 
-static const struct of_device_id z7e_wm8960_of_match[] = {
-	{ .compatible = "iveia,z7e-sound", },
+static const struct of_device_id z7_bone_island_wm8960_of_match[] = {
+	{ .compatible = "iveia,z7-bone-island-sound", },
 	{},
 };
-MODULE_DEVICE_TABLE(of, z7e_wm8960_of_match);
+MODULE_DEVICE_TABLE(of, z7_bone_island_wm8960_of_match);
 
-static struct platform_driver z7e_wm8960_card_driver = {
+static struct platform_driver z7_bone_island_wm8960_card_driver = {
 	.driver = {
-		.name = "z7e-wm8960-snd",
-		.of_match_table = z7e_wm8960_of_match,
+		.name = "z7-bone-island-wm8960-snd",
+		.of_match_table = z7_bone_island_wm8960_of_match,
 		.pm = &snd_soc_pm_ops,
 	},
-	.probe = z7e_wm8960_probe,
-	.remove = z7e_wm8960_remove,
+	.probe = z7_bone_island_wm8960_probe,
+	.remove = z7_bone_island_wm8960_remove,
 };
-module_platform_driver(z7e_wm8960_card_driver);
+module_platform_driver(z7_bone_island_wm8960_card_driver);
 
 MODULE_DESCRIPTION("ASoC iVeia board WM8960  driver");
 MODULE_AUTHOR("Patrick Cleary");

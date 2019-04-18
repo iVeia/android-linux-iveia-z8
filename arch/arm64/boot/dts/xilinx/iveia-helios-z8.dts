@@ -55,6 +55,43 @@
 
 &amba {
 
+	helios_bone_island_aud_clock: iv_io_00125_oscillator {
+		compatible = "fixed-clock";
+		#clock-cells = <1>;
+		clock-frequency  = <18500000>;
+		clock-output-names = "aud_clock";
+	};
+
+	helios_bone_island_i2s_receiver: iv_io_00125_i2s_receiver@80020000 {
+		compatible = "xlnx,i2s-receiver-1.0";
+		reg = <0x0 0x80020000 0x0 0x10000>;
+		xlnx,dwidth = <0x10>;
+		xlnx,num-channels = <1>;
+		xlnx,snd-pcm = <&helios_bone_island_audio_audio_formatter>;
+		audio-codec = <&iv_io_00125_wm8960>;
+	};
+
+	helios_bone_island_i2s_transmitter: iv_io_00125_i2s_transmitter@80010000 {
+		compatible = "xlnx,i2s-transmitter-1.0";
+		reg = <0x0 0x80010000 0x0 0x10000>;
+		xlnx,dwidth = <0x10>;
+		xlnx,num-channels = <1>;
+		xlnx,snd-pcm = <&helios_bone_island_audio_audio_formatter>;
+		audio-codec = <&iv_io_00125_wm8960>;
+	};
+
+	helios_bone_island_audio_audio_formatter: iv_io_00125_audio_formatter@80000000 {
+		compatible = "xlnx,audio-formatter-1.0";
+		interrupt-names = "irq_mm2s", "irq_s2mm";
+		interrupt-parent = <&gic>;
+		interrupts = <0 89 4>, <0 90 4>;
+		reg = <0x0 0x80000000 0x0 0x1000>;
+		xlnx,tx = <&helios_bone_island_i2s_transmitter>;
+		xlnx,rx = <&helios_bone_island_i2s_receiver>;
+		clock-names = "s_axi_lite_aclk", "aud_mclk";
+		clocks = <&clk 72>, <&helios_bone_island_aud_clock 0>;
+	};
+
 		sv_driver_plat@80000000 {
 			compatible = "xlnx,sv_driver_plat";
 			interrupt-parent = <&gic>;
@@ -213,7 +250,7 @@
         clock-names = "pclk";
 		interrupt-parent = <&gic>;
 		interrupts = < 0 95 4 >;
-		reg = < 0x0 0x80002000 0x0 0x10000 >;
+		reg = < 0x0 0x80002000 0x0 0x1000 >;
 
         tsc@4a {
 		    reg = <0x4a>;
@@ -246,7 +283,7 @@
         clock-names = "pclk";
 		interrupt-parent = <&gic>;
 		interrupts = < 0 95 4 >;
-		reg = < 0x0 0x80002000 0x0 0x10000 >;
+		reg = < 0x0 0x80002000 0x0 0x1000 >;
 
     	switch@71 {
             compatible = "nxp,pca9547";
@@ -548,6 +585,13 @@
     iv_io_00125_tmp@48 {
 		compatible = "national,lm75";
 		reg = <0x48>;	
+	};
+
+	iv_io_00125_wm8960: iv_io_00125_wm8960@1a {//Atlas-I-Z8 on Bone-Island Carrier
+		compatible = "wlf,wm8960";
+		//#address-cells = <1>;
+		//#size-cells = <0>;
+		reg = <0x1a>;
 	};
 
 	iv_io_00123_switch@71 {

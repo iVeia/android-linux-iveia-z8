@@ -13,9 +13,12 @@ config SND_SOC_Z7E_WM8960
 	select SND_SOC_ADI_IV_AXI_I2S
 	select SND_SOC_WM8960
 
-config SND_SOC_Z8_WM8960
-    tristate "Z8 board sound support"
-    depends on SND_SOC_IVEIA
-    select SND_SOC_ADI_IV_AXI_I2S
-    select SND_SOC_WM8960
+config SND_SOC_Z7_BONE_ISLAND_WM8960
+	tristate "Z7 Bone Island board sound support"
+	depends on SND_SOC_IVEIA
+	select SND_SOC_ADI_IV_AXI_I2S
+	select SND_SOC_WM8960
 
+config SND_SOC_Z8_BONE_ISLAND_WM8960
+	tristate "Z8 Bone Island board sound support"
+	select SND_SOC_WM8960
