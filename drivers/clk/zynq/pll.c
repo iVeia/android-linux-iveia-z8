@@ -133,8 +133,6 @@ static int zynq_pll_enable(struct clk_hw *hw)
 	if (zynq_pll_is_enabled(hw))
 		return 0;
 
-	pr_info("PLL: enable\n");
-
 	/* Power up PLL and wait for lock */
 	spin_lock_irqsave(clk->lock, flags);
 
@@ -162,8 +160,6 @@ static void zynq_pll_disable(struct clk_hw *hw)
 
 	if (!zynq_pll_is_enabled(hw))
 		return;
-
-	pr_info("PLL: shutdown\n");
 
 	/* shut down PLL */
 	spin_lock_irqsave(clk->lock, flags);

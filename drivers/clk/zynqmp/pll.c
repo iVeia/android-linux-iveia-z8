@@ -291,8 +291,6 @@ static int zynqmp_pll_enable(struct clk_hw *hw)
 	if (zynqmp_pll_is_enabled(hw))
 		return 0;
 
-	pr_info("PLL: enable\n");
-
 	ret = eemi_ops->clock_enable(clk_id);
 	if (ret)
 		pr_warn_once("%s() clock enable failed for %s, ret = %d\n",
@@ -319,8 +317,6 @@ static void zynqmp_pll_disable(struct clk_hw *hw)
 
 	if (!zynqmp_pll_is_enabled(hw))
 		return;
-
-	pr_info("PLL: shutdown\n");
 
 	ret = eemi_ops->clock_disable(clk_id);
 	if (ret)
