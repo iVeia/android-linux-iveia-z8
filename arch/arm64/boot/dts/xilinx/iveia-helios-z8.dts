@@ -251,28 +251,6 @@
 		interrupt-parent = <&gic>;
 		interrupts = < 0 95 4 >;
 		reg = < 0x0 0x80002000 0x0 0x1000 >;
-
-        tsc@4a {
-		    reg = <0x4a>;
-		    compatible = "atmel,maxtouch";
-		    interrupt-parent = <&gic>;
-		    interrupts = <0 94 4>;
-	    };
-
-        tsc@4b {
-		    reg = <0x4b>;
-		    compatible = "atmel,maxtouch";
-		    interrupt-parent = <&gic>;
-		    interrupts = <0 94 4>;
-	    };
- 
-        tsc@4c {
-		    reg = <0x4c>;
-		    compatible = "atmel,maxtouch";
-		    interrupt-parent = <&gic>;
-		    interrupts = <0 94 4>;
-	    };
-
 	};
 
     iv_io_00125_axi_iic: i2c@80002000 {
