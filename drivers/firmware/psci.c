@@ -513,7 +513,9 @@ static void __init psci_0_2_set_functions(void)
 
 	psci_ops.migrate_info_type = psci_migrate_info_type;
 
+#ifndef CONFIG_ARM_PSCI_NO_RESTART
 	arm_pm_restart = psci_sys_reset;
+#endif
 
 	pm_power_off = psci_sys_poweroff;
 }

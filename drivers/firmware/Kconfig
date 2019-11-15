@@ -19,6 +19,18 @@ config ARM_PSCI_CHECKER
 	  on and off through hotplug, so for now torture tests and PSCI checker
 	  are mutually exclusive.
 
+config ARM_PSCI_NO_RESTART
+	bool "ARM PSCI disable restart"
+	depends on ARM_PSCI_FW
+	default y
+	help
+      Disables the ARM PSCI default handling of restart, which circumvents the
+      restart handler call chain.
+
+      If this config is enabled, then there will be no restart handler by
+      default.  A handler (such as gpio-restart) must be enabled, or restart
+      will not work.
+
 config ARM_SCPI_PROTOCOL
 	tristate "ARM System Control and Power Interface (SCPI) Message Protocol"
 	depends on ARM || ARM64 || COMPILE_TEST
