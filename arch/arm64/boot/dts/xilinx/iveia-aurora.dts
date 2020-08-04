@@ -1,0 +1,599 @@
+/*
+* dts file for iVeia Atlas-II-Z8
+*
+*
+* Patrick Cleary <pcleary@iveia.com>
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License as
+* published by the Free Software Foundation; either version 2 of
+* the License, or (at your option) any later version.
+*/
+
+/dts-v1/;
+
+#include "zynqmp.dtsi"
+#include "zynqmp-clk-ccf.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/phy/phy.h>
+#include <dt-bindings/media/xilinx-vip.h>
+
+/ {
+	model = "ZynqMP ZCU102";
+	compatible = "xlnx,zynqmp-zcu102", "xlnx,zynqmp";
+
+
+	aliases {
+		ethernet0 = &aurora_gem0;
+		gpio0 = &gpio;
+		i2c0 = &i2c0;
+		i2c1 = &i2c1;
+		rtc0 = &rtc;
+		serial0 = &uart1;
+		serial1 = &uart0;
+		spi0 = &qspi;
+		usb0 = &iusb0;
+		usb1 = &iusb1;
+	};
+
+	chosen {
+                //bootargs = "console=ttyPS1,115200n8 earlycon=cdns,mmio,0xff010000,115200n8 init=/init video=DP-1:1024x768@60 root=/dev/mmcblk0p2 rw rootfstype=ext4 drm.debug=0xf rootwait androidboot.selinux=disabled androidboot.hardware=zcu102 qemu=1";
+		//bootargs = "console=ttyPS0,115200n8 single root=/dev/mmcblk0p3 rw rootfstype=ext4 rootwait rw earlyprintk loglevel=9";
+                //bootargs = "console=ttyPS1,115200n8 rw earlyprintk loglevel=9";
+                bootargs = "earlycon loglevel=9";
+                stdout-path = "serial0:115200n8";
+	};
+
+	memory {
+		device_type = "memory";
+		reg = <0x0 0x0 0x0 0x80000000>, <0x8 0x00000000 0x0 0x80000000>;
+	};
+
+
+};
+
+
+&amba {
+
+	sv_driver_plat@80000000 {
+		compatible = "xlnx,sv_driver_plat";
+		interrupt-parent = <&gic>;
+		interrupts = <0x0 106 0x4>;
+		reg = <0x0 0x80000000 0x0 0x1000 0x0 0x80001000 0x0 0x1000 0x0 0x80002000 0x0 0x1000 0x0 0x88000000 0x0 0x4000000 0x0 0x8C000000 0x0 0x4000000>;
+	};
+
+        fake_touch {
+                compatible = "iveia,fakets";
+        };
+
+        /*
+        //ETH0
+	default_eth0: default_ethernet@ff0b0000 {
+		compatible = "cdns,zynqmp-gem", "cdns,gem";
+		status = "okay";
+		interrupt-parent = <&gic>;
+		interrupts = <0 57 4>, <0 57 4>;
+		reg = <0x0 0xff0b0000 0x0 0x1000>;
+		clocks = <&clk 31>, <&clk 104>, <&clk 45>, <&clk 49>, <&clk 44>;
+		clock-names = "pclk", "hclk", "tx_clk", "rx_clk", "tsu_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#stream-id-cells = <1>;
+		iommus = <&smmu 0x874>;
+		power-domains = <&pd_eth0>;
+		phy-mode = "gmii";
+
+	};
+        // ETH1
+	iv_gem1: iv_ethernet@ff0c0000 {
+		compatible = "cdns,zynqmp-gem", "cdns,gem";
+		status = "okay";
+		interrupt-parent = <&gic>;
+		interrupts = <0 59 4>, <0 59 4>;
+		reg = <0x0 0xff0c0000 0x0 0x1000>;
+		clocks = <&clk 31>, <&clk 105>, <&clk 46>, <&clk 50>, <&clk 44>;
+		clock-names = "pclk", "hclk", "tx_clk", "rx_clk", "tsu_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#stream-id-cells = <1>;
+		iommus = <&smmu 0x875>;
+		power-domains = <&pd_eth1>;
+
+                phy-mode = "gmii";
+	};
+
+        // ETH2
+	iv_gem2: iv_ethernet@ff0d0000 {
+		compatible = "cdns,zynqmp-gem", "cdns,gem";
+		status = "okay";
+		interrupt-parent = <&gic>;
+		interrupts = <0 61 4>, <0 61 4>;
+		reg = <0x0 0xff0d0000 0x0 0x1000>;
+		clocks = <&clk 31>, <&clk 106>, <&clk 47>, <&clk 51>, <&clk 44>;
+		clock-names = "pclk", "hclk", "tx_clk", "rx_clk", "tsu_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#stream-id-cells = <1>;
+		iommus = <&smmu 0x876>;
+		power-domains = <&pd_eth2>;
+
+                phy-mode = "gmii";
+	};
+        */
+        
+        // ETH3
+        aurora_gem0: aurora_ethernet@ff0e0000 {
+                //Aurora and Watershed have same PHY Connection
+		compatible = "cdns,zynqmp-gem", "cdns,gem";
+		status = "okay";
+		interrupt-parent = <&gic>;
+		interrupts = <0 63 4>, <0 63 4>;
+		reg = <0x0 0xff0e0000 0x0 0x1000>;
+		clocks = <&clk 31>, <&clk 107>, <&clk 48>, <&clk 52>, <&clk 44>;
+		clock-names = "pclk", "hclk", "tx_clk", "rx_clk", "tsu_clk";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#stream-id-cells = <1>;
+		iommus = <&smmu 0x877>;
+		power-domains = <&pd_eth3>;
+                phy-mode = "sgmii";
+                phy-names = "sgmii-phy";
+
+                phy-handle = <&aurora_phy0>;
+                use-internal-mdio = <1>;
+
+                aurora_phy0: phy@0 {
+                        compatible = "ethernet-phy-ieee802.3-c22";
+                        device_type = "ethernet-phy";
+                        reg = <1>;
+                };
+        };
+
+	iusb0: iusb0 {//May need to delete for Atlas-III-Z8 RevA or RevB
+		#address-cells = <2>;
+		#size-cells = <2>;
+		status = "okay";
+		compatible = "xlnx,zynqmp-dwc3";
+		reg = <0x0 0xff9d0000 0x0 0x100>;
+		clocks = <&clk 32>, <&clk 34>;
+		clock-names = "bus_clk", "ref_clk";
+		power-domains = <&pd_usb0>;
+		ranges;
+		nvmem-cells = <&soc_revision>;
+		nvmem-cell-names = "soc_revision";
+                
+		iv_dwc3_0: iv_dwc3@fe200000 {
+			compatible = "snps,dwc3";
+			status = "okay";
+			reg = <0x0 0xfe200000 0x0 0x40000>;
+			interrupt-parent = <&gic>;
+			interrupts = <0 65 4>, <0 69 4>, <0 75 4>;
+			#stream-id-cells = <1>;
+			iommus = <&smmu 0x860>;
+			snps,quirk-frame-length-adjustment = <0x20>;
+			snps,refclk_fladj;
+			snps,enable_guctl1_resume_quirk;
+			snps,enable_guctl1_ipd_quirk;
+			snps,xhci-stream-quirk;
+			/* dma-coherent; */
+			/* snps,enable-hibernation; */
+                        
+	                dr_mode = "host";
+	                snps,usb3_lpm_capable;
+	                phy-names = "usb3-phy";
+	                //phys = <&lane0 PHY_TYPE_USB3 0 2 26000000>;
+                        
+		};
+                
+	};
+
+	iusb1: iusb1 {//May need to delete for Atlas-III-Z8 RevA or RevB
+		#address-cells = <2>;
+		#size-cells = <2>;
+		status = "okay";
+		compatible = "xlnx,zynqmp-dwc3";
+		reg = <0x0 0xff9e0000 0x0 0x100>;
+		clocks = <&clk 33>, <&clk 34>;
+		clock-names = "bus_clk", "ref_clk";
+                
+		power-domains = <&pd_usb1>;
+		ranges;
+		nvmem-cells = <&soc_revision>;
+		nvmem-cell-names = "soc_revision";
+                
+		iv_dwc3_1: iv_dwc3_1@fe300000 {
+			compatible = "snps,dwc3";
+			status = "okay";
+			reg = <0x0 0xfe300000 0x0 0x40000>;
+			interrupt-parent = <&gic>;
+			interrupts = <0 70 4>, <0 74 4>, <0 76 4>;
+			#stream-id-cells = <1>;
+			iommus = <&smmu 0x861>;
+			snps,quirk-frame-length-adjustment = <0x20>;
+			snps,refclk_fladj;
+			snps,enable_guctl1_resume_quirk;
+			snps,enable_guctl1_ipd_quirk;
+			snps,xhci-stream-quirk;
+			/* dma-coherent; */
+                        
+			// Required for USB 2.0
+			snps,dis_u2_susphy_quirk;
+			snps,dis_u3_susphy_quirk;
+                        
+			dr_mode = "peripheral";
+			maximum-speed = "high-speed";
+                        
+		};
+	};
+        
+//};
+//
+//amba_pl: amba_pl@0 {
+        //        #address-cells = <2>;
+        //        #size-cells = <2>;
+        //        compatible = "simple-bus";
+        //        ranges ;
+        //        
+
+        misc_clk_0: misc_clk_0 {
+                #clock-cells = <0>;
+                clock-frequency = <300000000>;
+                compatible = "fixed-clock";
+        };
+        
+        /**************************************************************/
+        // TPG
+        tpg_input@a0040000 {
+                compatible = "xlnx,v-tpg-8.0", "xlnx,v-tpg-7.0";
+                reg = <0x0 0xa0040000 0x0 0x10000>;
+                clock-names = "s_axis_video_aclk";
+                clocks = <&misc_clk_0>;
+                reset-gpios = <&gpio 88 1>;
+                //xlnx,max-height = <2160>;
+                //xlnx,max-width = <3840>;
+                //xlnx,ppc = <0x2>;
+
+                ports {
+                        #address-cells = <0x1>;
+                        #size-cells = <0x0>;
+
+                        port@0 {
+                                reg = <0x0>;
+                                xlnx,video-format = <XVIP_VF_RBG>;
+                                xlnx,video-width = <8>;
+
+                                tpg_input_dev: endpoint {
+                                        remote-endpoint = <&vcap_tpg_dev>;
+                                };
+                        };
+                };
+        };
+        // TPG frame buffer
+        tpg_input_frmbuf: v_frmbuf_wr@a0030000 {
+                compatible = "xlnx,v-frmbuf-wr-2", "xlnx,axi-frmbuf-wr-v2";
+                #dma-cells = <1>;
+                interrupt-names = "interrupt";
+                interrupt-parent = <&gic>;
+                interrupts = <0 90 4>;
+                reg = <0x0 0xa0030000 0x0 0x10000>;
+                reset-gpios = <&gpio 89 1>;
+                xlnx,dma-addr-width = <64>;
+                xlnx,vid-formats = "rgb888","bgr888";
+                //clock-names = "ap_clk";
+                //clocks = <&misc_clk_0>;
+                //xlnx,dma-align = <32>;
+                //xlnx,max-height = <2160>;
+                //xlnx,max-width = <3840>;
+                //xlnx,pixels-per-clock = <1>;
+                //xlnx,s-axi-ctrl-addr-width = <0x7>;
+                //xlnx,s-axi-ctrl-data-width = <0x20>;
+                //xlnx,video-width = <8>;
+        };
+        vcap_tpg {
+                compatible = "xlnx,video";
+                dmas = <&tpg_input_frmbuf 0>;
+                dma-names = "port0";
+
+                ports {
+                        #address-cells = <0x1>;
+                        #size-cells = <0x0>;
+
+                        port@0 {
+                                reg = <0x0>;
+                                direction = "input";
+
+                                vcap_tpg_dev: endpoint {
+                                        remote-endpoint = <&tpg_input_dev>;
+                                };
+                        };
+                };
+        };
+        /* ---------------------------------------------------------- */
+
+        /*************************************************************/
+        // Dummy input from output
+        /*
+        dummy_io {
+		compatible = "xlnx,dummy";
+		#address-cells = <0x1>;
+		#size-cells = <0x0>;
+		clocks = <&misc_clk_0>;
+		reset-gpios = <&gpio 118 1>;
+		//reg = <0x0 0xa02e0000 0x0 0x10000>;
+                
+		ports {
+			#address-cells = <0x1>;
+                	#size-cells = <0x0>;
+
+	                port@0 {
+				reg = <0x0>;
+				xlnx,video-format = <XVIP_VF_RBG>;
+				xlnx,video-width = <0x8>;
+
+				dummy_io_dev: endpoint {
+					remote-endpoint = <&vcap_dummy_io_dev>;
+				};
+			};
+		};
+	};
+
+	dummy_io_frmbuf: frmbuf_wr@a0020000 {
+		compatible = "xlnx,axi-frmbuf-wr-v2";
+		#dma-cells = <1>;
+		interrupt-parent = <&gic>;
+		interrupts = <0 92 4>;
+		reg = <0x0 0xa0020000 0x0 0x10000>;
+		reset-gpios = <&gpio 99 1>;
+		xlnx,dma-addr-width = <64>;
+		xlnx,vid-formats = "bgr888","rgb888";
+	};
+
+	vcap_dummy_io {
+		compatible = "xlnx,video";
+		dmas = <&dummy_io_frmbuf 0>;
+		dma-names = "port0";
+
+		ports {
+			#address-cells = <0x1>;
+			#size-cells = <0x0>;
+
+			port@0 {
+				reg = <0x0>;
+				direction = "input";
+
+				vcap_dummy_io_dev: endpoint {
+					remote-endpoint = <&dummy_io_dev>;
+				};
+			};
+		};
+	};
+        */
+        // -------------------------------------------------------------
+
+        /**************************************************************/
+        // Dummy output
+	//hdmi_output_v_frmbuf_rd_0: v_frmbuf_rd@a0040000 {
+		//        compatible = "xlnx,axi-frmbuf-rd-v2";
+		//        #dma-cells = <1>;
+		//        interrupt-parent = <&gic>;
+		//        interrupts = <0 89 4>;
+		//        reg = <0x0 0xa0040000 0x0 0x10000>;
+		//        reset-gpios = <&gpio 79 1>;
+		//        xlnx,dma-addr-width = <64>;
+		//        xlnx,vid-formats = "bgr888","rgb888";
+	//};
+
+
+
+};
+
+&pss_ref_clk {
+        clock-frequency = <50000000>;
+};
+
+&fclk0 {
+	status = "okay";
+	clock-frequency = <50000000>;
+};
+
+&fclk1 {
+	status = "okay";
+	clock-frequency = <100000000>;
+};
+
+&fclk2 {
+	status = "okay";
+	clock-frequency = <150000000>;
+};
+
+&fclk3 {
+	status = "okay";
+	clock-frequency = <100000000>;
+};
+
+&serdes {
+	status = "okay";
+};
+
+&can0 {
+	status = "okay";
+};
+
+&can1 {
+	status = "okay";
+};
+
+&gpio {
+	status = "okay";
+};
+
+
+&fpd_dma_chan1 {
+	status = "okay";
+};
+
+&fpd_dma_chan2 {
+	status = "okay";
+};
+
+&fpd_dma_chan3 {
+	status = "okay";
+};
+
+&fpd_dma_chan4 {
+	status = "okay";
+};
+
+&fpd_dma_chan5 {
+	status = "okay";
+};
+
+&fpd_dma_chan6 {
+	status = "okay";
+};
+
+&fpd_dma_chan7 {
+	status = "okay";
+};
+
+&fpd_dma_chan8 {
+	status = "okay";
+};
+
+&gpio {
+	status = "okay";
+};
+
+&gpu {
+	status = "okay";
+};
+
+&watchdog0 {
+	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <400000>;
+        
+	aurora_switch@77 {
+                compatible = "nxp,pca9547";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0x77>;
+	        
+		i2c@0 {
+			#address-cells = <1>;
+                        #size-cells = <0>;
+                        reg = <0>;
+	                
+                        rtc@68 {
+                                compatible = "stm,m41t62";
+                                reg = <0x68>;
+                        };
+
+                        tempsens@4f {
+                                compatible = "national,lm75";
+                                reg = <0x4f>;
+                        };			
+                };		
+	};
+
+};
+
+&i2c1 {
+	status = "okay";
+	clock-frequency = <400000>;
+};
+
+&pcie {
+	status = "okay";
+	phys = <&lane0 PHY_TYPE_PCIE 0 0 100000000>;
+};
+
+&qspi {
+        status = "okay";
+        is-dual = <0>;
+        iv_mb_00090_flash@0 {
+                compatible = "n25q128a13";
+                #address-cells = <1>;
+                #size-cells = <1>;
+                reg = <0x0>;
+                spi-max-frequency = <50000000>;
+                partition@qspi-fsbl-uboot {
+                        label = "qspi-fsbl-uboot";
+                        reg = <0x0 0x1000000>;
+                };
+        };
+};
+
+&spi0 {
+	status = "okay";
+
+	aurora_tpm_spi_tis@0{
+		compatible = "tcg,tpm_tis-spi";
+ 		reg = <0>;	/* CE0 */
+ 		spi-max-frequency = <500000>;
+ 	};
+};
+
+&rtc {
+	status = "okay";
+};
+
+/* SD1 with level shifter */
+&sdhci1 {
+	status = "okay";
+	no-1-8-v;
+	xlnx,mio_bank = <1>;
+	disable-wp;
+};
+
+&sdhci0 {
+	status = "okay";
+	no-1-8-v;
+	xlnx,mio_bank = <0>;
+	disable-wp;
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&xilinx_ams {
+	status = "okay";
+};
+
+&ams_ps {
+	status = "okay";
+};
+
+&ams_pl {
+	status = "okay";
+};
+
+//In ZCU102 DTS. Added with kernel update for 2018.3
+
+&zynqmp_dp_snd_codec0 {
+	status = "okay";
+};
+
+&zynqmp_dp_snd_pcm0 {
+	status = "okay";
+};
+
+&zynqmp_dp_snd_pcm1 {
+	status = "okay";
+};
+
+&zynqmp_dp_snd_card0 {
+	status = "okay";
+};
+
+&xlnx_dpdma {
+	status = "okay";
+};

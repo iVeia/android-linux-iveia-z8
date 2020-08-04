@@ -626,7 +626,9 @@ static int xvip_composite_probe(struct platform_device *pdev)
 	struct xvip_composite_device *xdev;
 	int ret;
 
-	xdev = devm_kzalloc(&pdev->dev, sizeof(*xdev), GFP_KERNEL);
+        dev_warn(&pdev->dev, "Probing composite video device");
+
+        xdev = devm_kzalloc(&pdev->dev, sizeof(*xdev), GFP_KERNEL);
 	if (!xdev)
 		return -ENOMEM;
 

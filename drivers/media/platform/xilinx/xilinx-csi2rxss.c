@@ -1203,28 +1203,33 @@ static int xcsi2rxss_set_format(struct v4l2_subdev *sd,
 	 * Otherwise don't allow change.
 	 */
 	if (((fmt->format.code == MEDIA_BUS_FMT_SBGGR8_1X8) ||
-		(fmt->format.code == MEDIA_BUS_FMT_SGBRG8_1X8) ||
-		(fmt->format.code == MEDIA_BUS_FMT_SGRBG8_1X8) ||
-		(fmt->format.code == MEDIA_BUS_FMT_SRGGB8_1X8))
-	|| ((core->datatype == MIPI_CSI_DT_RAW_10) &&
+             (fmt->format.code == MEDIA_BUS_FMT_SGBRG8_1X8) ||
+             (fmt->format.code == MEDIA_BUS_FMT_SGRBG8_1X8) ||
+             (fmt->format.code == MEDIA_BUS_FMT_SRGGB8_1X8))
+            || ((core->datatype == MIPI_CSI_DT_RAW_10) &&
 		((fmt->format.code == MEDIA_BUS_FMT_SBGGR10_1X10) ||
 		 (fmt->format.code == MEDIA_BUS_FMT_SGBRG10_1X10) ||
 		 (fmt->format.code == MEDIA_BUS_FMT_SGRBG10_1X10) ||
 		 (fmt->format.code == MEDIA_BUS_FMT_SRGGB10_1X10)))
-	|| ((core->datatype == MIPI_CSI_DT_RAW_12) &&
+            || ((core->datatype == MIPI_CSI_DT_RAW_12) &&
 		((fmt->format.code == MEDIA_BUS_FMT_SBGGR12_1X12) ||
 		 (fmt->format.code == MEDIA_BUS_FMT_SGBRG12_1X12) ||
 		 (fmt->format.code == MEDIA_BUS_FMT_SGRBG12_1X12) ||
 		 (fmt->format.code == MEDIA_BUS_FMT_SRGGB12_1X12))))
-
-		/* Copy over the format to be set */
-		*__format = fmt->format;
-	else {
-		/* Restore the original pad format code */
-		fmt->format.code = code;
-		__format->code = code;
-	}
-
+          {
+            
+            /* Copy over the format to be set */
+            printk(KERN_WARNING "Copying SRGB format: ");
+            *__format = fmt->format;
+          } else {
+          /* Restore the original pad format code */
+          printk(KERN_WARNING "Copying code but with size too");
+          fmt->format.code = code;
+          __format->code = code;
+          __format->width = fmt->format.width;
+          __format->height = fmt->format.height;
+        }
+        
 	mutex_unlock(&xcsi2rxss->lock);
 
 	return 0;
