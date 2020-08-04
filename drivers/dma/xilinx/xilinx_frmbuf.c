@@ -1088,6 +1088,8 @@ static int xilinx_frmbuf_chan_probe(struct xilinx_frmbuf_device *xdev,
 	chan->xdev = xdev;
 	chan->idle = true;
 
+        dev_warn(xdev->dev, "Probing frame buffer");
+        
 	err = of_property_read_u32(node, "xlnx,dma-addr-width",
 				   &dma_addr_size);
 	if (err || (dma_addr_size != 32 && dma_addr_size != 64)) {

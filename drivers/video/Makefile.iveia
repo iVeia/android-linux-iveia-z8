@@ -1,1 +1,2 @@
 obj-$(CONFIG_IVEIA_FB)            += iveia_fb.o
+obj-$(CONFIG_IVEIA_FB_HDMI)            += iveia_fb_hdmi.o

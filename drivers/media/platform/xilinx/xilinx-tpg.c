@@ -970,6 +970,8 @@ static int xtpg_probe(struct platform_device *pdev)
 	u32 npatterns;
 	int ret;
 
+        dev_warn(&pdev->dev, "probing tgp");
+        
 	xtpg = devm_kzalloc(&pdev->dev, sizeof(*xtpg), GFP_KERNEL);
 	if (!xtpg)
 		return -ENOMEM;

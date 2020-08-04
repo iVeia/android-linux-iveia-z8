@@ -1,1 +1,2 @@
 obj-$(CONFIG_TOUCHSCREEN_ATMEL_MAXTOUCH)+= iveia_atmel_mxt_ts.o
+obj-$(CONFIG_IVEIA_FAKE_TOUCH)+= iveia_fake_ts.o

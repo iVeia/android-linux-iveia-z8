@@ -120,4 +120,10 @@ config VIDEO_XILINX_DUMMY
         ---help---
            Driver for the Xilinx dummy video source
 
+config VIDEO_IVEIA_BASLER
+	tristate "iVeia Basler driver"
+	depends on VIDEO_XILINX
+	---help---
+	Driver for Basler MIPI cameras
+
 endif #VIDEO_XILINX
