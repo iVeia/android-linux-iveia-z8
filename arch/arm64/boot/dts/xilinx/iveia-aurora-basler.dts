@@ -687,7 +687,6 @@
                                         #address-cells = <1>;
                                         #size-cells = <0>;
                                         reg = <1>;
-
                                         /*
                                         basler_camera_mipi0: basler_camera_mipi0@36 {
                                                 compatible = "iveia,basler-mipi";
