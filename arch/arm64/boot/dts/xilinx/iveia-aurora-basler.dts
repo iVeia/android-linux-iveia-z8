@@ -24,7 +24,7 @@
 
 
 	aliases {
-		ethernet0 = &aurora_gem0;
+		ethernet0 = &gem0;
 		gpio0 = &gpio;
 		i2c0 = &i2c0;
 		i2c1 = &i2c1;
@@ -53,6 +53,15 @@
 };
 
 
+&gem0 {
+        phy-mode = "gmii";
+        status = "okay";
+        xlnx,ptp-enet-clock = <0x0>;
+        clock-names = "pclk", "hclk", "tx_clk", "rx_clk", "tsu_clk";
+        clocks = <&clk 31>, <&clk 104>, <&clk 45>, <&clk 49>, <&clk 44>;
+};
+        
+
 &amba {
 
 	sv_driver_plat@80000000 {
@@ -75,8 +84,36 @@
                 wait-delay = <3000>;
         };
 
+        /*
+        aurora_gem0: aurora_gem0@ff0b0000 {
+                compatible = "cdns,zynqmp-gem", "cdns,gem";
+                status = "okay";
+                interrupt-parent = <&gic>;
+                interrupts = <0 57 4>, <0 57 4>;
+                reg = <0x0 0xff0b0000 0x0 0x1000>;
+                clocks = <&clk 31>, <&clk 104>, <&clk 45>, <&clk 49>, <&clk 44>;
+                clock-names = "pclk", "hclk", "tx_clk", "rx_clk", "tsu_clk";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                #stream-id-cells = <1>;
+                iommus = <&smmu 0x874>;
+                power-domains = <&pd_eth0>;
+                phy-mode = "gmii";
+                xlnx,ptp-enet-clock = <0x00000000>;
+                
+                //phy-handle = <&aurora_phy0>;
+                //use-internal-mdio = <1>;
+
+                //aurora_phy0: phy@0 {
+                //        compatible = "ethernet-phy-ieee802.3-c22";
+                //        device_type = "ethernet-phy";
+                //        reg = <1>;
+                //};
+        };
+        */
+
         // ETH3
-        aurora_gem0: aurora_ethernet@ff0e0000 {
+        aurora_gem3: aurora_gem3@ff0e0000 {
                 //Aurora and Watershed have same PHY Connection
 		compatible = "cdns,zynqmp-gem", "cdns,gem";
 		status = "okay";
@@ -93,10 +130,10 @@
                 phy-mode = "sgmii";
                 phy-names = "sgmii-phy";
 
-                phy-handle = <&aurora_phy0>;
+                phy-handle = <&aurora_phy3>;
                 use-internal-mdio = <1>;
 
-                aurora_phy0: phy@0 {
+                aurora_phy3: phy@0 {
                         compatible = "ethernet-phy-ieee802.3-c22";
                         device_type = "ethernet-phy";
                         reg = <1>;
@@ -209,7 +246,6 @@
 			xlnx,trig1-assert = <0x1>;
 		};
 
-        /*
 		mipi_csi2_rx_v_frmbuf_wr_0: v_frmbuf_wr@a0260000 {
 			#dma-cells = <1>;
 			clock-names = "ap_clk";
@@ -491,7 +527,6 @@
 				};
 			};
 		};
-        */
 
 		misc_clk_1: misc_clk_1 {
 			#clock-cells = <0>;
@@ -687,7 +722,6 @@
                                         #address-cells = <1>;
                                         #size-cells = <0>;
                                         reg = <1>;
-                                        /*
                                         basler_camera_mipi0: basler_camera_mipi0@36 {
                                                 compatible = "iveia,basler-mipi";
                                                 reg = <0x36>;
@@ -708,7 +742,6 @@
                                                 };
                                                 
                                         };
-                                        */
                                         
                                 };
                                 i2c_70@2 {
@@ -716,7 +749,6 @@
                                         #size-cells = <0>;
                                         reg = <2>;
 
-                                        /*
                                         basler_camera_mipi1: basler_camera_mipi1@36 {
                                                 compatible = "iveia,basler-mipi";
                                                 reg = <0x36>;
@@ -734,7 +766,6 @@
                                                         };
                                                 };
                                         };
-                                        */                                        
                                 };
                                 i2c_70@3 {
                                         #address-cells = <1>;
