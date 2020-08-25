@@ -131,11 +131,8 @@ static int basler_write_burst(struct i2c_client *client,
   }
   else if(I2CWRITE == (ra_p->command | I2CWRITE)){
     ret = i2c_master_send(client, (char *)ra_p, ra_p->data_size + sizeof(ra_p->address));
-    
-    printk(KERN_ALERT " -w> 0x%X ", old_address);                                                                                                                                                                                                         
-    print_hex_dump(KERN_ALERT, "w: ", DUMP_PREFIX_NONE, 16, 1,                                                                                                                                                                                          
-                   (char *)ra_p, ra_p->data_size + sizeof(ra_p->address), 1);
-    
+
+
     if(ret)
       ra_p->data_size = ret;
 
@@ -190,13 +187,6 @@ static int basler_read_register_chunk(struct i2c_client* client, __u8* buffer, _
 
   ret = i2c_transfer(client->adapter, msgs, 2);
 
-  printk(KERN_ALERT " <ret> %d\n", ret);
-  printk(KERN_ALERT " -w> 0x%X ", msgs[0].addr);
-  print_hex_dump(KERN_ALERT, "w: ", DUMP_PREFIX_NONE, 16, 1, (char *)msgs[0].buf, msgs[0].len, 1);
-
-  printk(KERN_ALERT " <r- 0x%X ", msgs[1].addr);
-  print_hex_dump(KERN_ALERT, "r: ", DUMP_PREFIX_NONE, 16, 1, (char *)msgs[1].buf, msgs[1].len, 1);
-  
   
   if (ret < 0) {
     pr_err("i2c_transfer() failed: %d\n", ret);
