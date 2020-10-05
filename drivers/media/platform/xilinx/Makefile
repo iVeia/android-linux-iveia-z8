@@ -18,3 +18,4 @@ obj-$(CONFIG_VIDEO_XILINX_VTC) += xilinx-vtc.o
 obj-$(CONFIG_VIDEO_XILINX_CSI2RXSS) += xilinx-csi2rxss.o
 obj-$(CONFIG_VIDEO_XILINX_DUMMY) += xilinx-dummy.o
 obj-$(CONFIG_VIDEO_IVEIA_BASLER) += iveia-basler.o
+obj-$(CONFIG_U_DMA_BUF) += u-dma-buf.o

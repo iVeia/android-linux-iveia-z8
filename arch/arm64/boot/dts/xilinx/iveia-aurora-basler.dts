@@ -84,6 +84,13 @@
                 wait-delay = <3000>;
         };
 
+        udmabuf@0x00 {
+                compatible = "ikwzm,u-dma-buf";
+                device-name = "udmabuf0";
+                size = <0x02800000>;
+        };
+
+
         /*
         aurora_gem0: aurora_gem0@ff0b0000 {
                 compatible = "cdns,zynqmp-gem", "cdns,gem";
