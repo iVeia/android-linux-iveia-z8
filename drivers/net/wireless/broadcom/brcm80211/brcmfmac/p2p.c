@@ -1660,6 +1660,14 @@ bool brcmf_p2p_send_action_frame(struct brcmf_cfg80211_info *cfg,
 	s32 extra_listen_time;
 	uint delta_ms;
 
+    /*
+     * Forcibly exit this function, as a NULL pointer violation is occuring
+     * when accessing vif ptr:
+	 *      p2p->bss_idx[P2PAPI_BSSCFG_DEVICE].vif
+     */
+    printk("INFO: brcmf_p2p_send_action_frame() disabled\n");
+    return false;
+
 	action_frame = &af_params->action_frame;
 	action_frame_len = le16_to_cpu(action_frame->len);
 
