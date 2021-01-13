@@ -1,6 +1,7 @@
 dtb-$(CONFIG_ARCH_ZYNQMP) += iveia-atlas-ii-z8.dtb
 dtb-$(CONFIG_ARCH_ZYNQMP) += iveia-helios-z8.dtb
 dtb-$(CONFIG_ARCH_ZYNQMP) += iveia-aurora.dtb
+dtb-$(CONFIG_ARCH_ZYNQMP) += iveia-landshark.dtb
 dtb-$(CONFIG_ARCH_ZYNQMP) += iveia-aurora-basler.dtb
 dtb-$(CONFIG_ARCH_ZYNQMP) += zynqmp-zc1232-revA.dtb
 dtb-$(CONFIG_ARCH_ZYNQMP) += zynqmp-zc1254-revA.dtb

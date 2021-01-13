@@ -26,8 +26,8 @@
  *********************************************************************/
 
 #define MODNAME "iveia_fb"
-#define IV_SCREEN_WIDTH (800)
-#define IV_SCREEN_HEIGHT (480)
+#define IV_SCREEN_WIDTH (1024)
+#define IV_SCREEN_HEIGHT (768)
 #define IV_BYTES_PER_PIXEL (2)
 #define ANDROID_BYTES_PER_PIXEL 2
 #if defined(CONFIG_MACH_IV_ATLAS_I_Z7E)
@@ -94,6 +94,8 @@ static int iveia_fb_probe(struct platform_device *dev)
 	struct fb_info * info = NULL;
     struct iveia_fb_par * par = NULL;
 	int ret;
+
+        pr_info("Probing iVeia framebuffer driver\n");
 
     fb_addr = ioremap(iveia_fb_fix.smem_start, iveia_fb_fix.smem_len);
 	if ( ! fb_addr ) return -ENOMEM;
