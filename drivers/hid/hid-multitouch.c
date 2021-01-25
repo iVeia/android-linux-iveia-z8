@@ -693,8 +693,8 @@ static void mt_complete_slot(struct mt_device *td, struct input_dev *input)
 				minor = minor >> 1;
 			}
 
-			input_event(input, EV_ABS, ABS_MT_POSITION_X, s->x);
-			input_event(input, EV_ABS, ABS_MT_POSITION_Y, s->y);
+			input_event(input, EV_ABS, ABS_MT_POSITION_X, 1024 - s->x);
+			input_event(input, EV_ABS, ABS_MT_POSITION_Y, 768 - s->y);
 			input_event(input, EV_ABS, ABS_MT_TOOL_X, s->cx);
 			input_event(input, EV_ABS, ABS_MT_TOOL_Y, s->cy);
 			input_event(input, EV_ABS, ABS_MT_DISTANCE,
