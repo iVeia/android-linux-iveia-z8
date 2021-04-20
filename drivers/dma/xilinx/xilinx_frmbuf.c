@@ -845,6 +845,7 @@ static void xilinx_frmbuf_start_transfer(struct xilinx_frmbuf_chan *chan)
 			 desc->hw.chroma_plane_addr);
 
 	/* HW expects these parameters to be same for one transaction */
+        //pr_warn("frmbuf - start: %d %d %d\n", desc->hw.hsize, desc->hw.stride, desc->hw.vsize);
 	frmbuf_write(chan, XILINX_FRMBUF_WIDTH_OFFSET, desc->hw.hsize);
 	frmbuf_write(chan, XILINX_FRMBUF_STRIDE_OFFSET, desc->hw.stride);
 	frmbuf_write(chan, XILINX_FRMBUF_HEIGHT_OFFSET, desc->hw.vsize);
@@ -981,9 +982,18 @@ xilinx_frmbuf_dma_prep_interleaved(struct dma_chan *dchan,
 
 	hw = &desc->hw;
 	hw->vsize = xt->numf;
-	hw->stride = xt->sgl[0].icg + xt->sgl[0].size;
+	hw->stride = /*xt->sgl[0].icg + */ xt->sgl[0].size;
 	hw->hsize = (xt->sgl[0].size * chan->vid_fmt->ppw * 8) /
 		     chan->vid_fmt->bpw;
+
+        //pr_warn("frmbuf prep: v:%d h:%d s:%d icg:%d size:%d dst_icg:%d src_icg:%d\n",
+        //        hw->vsize,
+        //        hw->hsize,
+        //        hw->stride,
+        //        xt->sgl[0].icg,
+        //        xt->sgl[0].size,
+        //        xt->sgl[0].dst_icg,
+        //        xt->sgl[0].src_icg);
 
 	/* hsize calc should not have resulted in an odd number */
 	if (hw->hsize & 1)

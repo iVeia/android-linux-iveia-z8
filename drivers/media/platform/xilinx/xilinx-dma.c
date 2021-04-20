@@ -836,6 +836,8 @@ __xvip_dma_try_format(struct xvip_dma *dma,
 			bpl = roundup(plane_fmt[0].bytesperline, dma->align);
 			plane_fmt[0].bytesperline = clamp(bpl, min_bpl,
 							  max_bpl);
+                        //pr_warn("xdma: mxbpl:%d mnbpl:%d align:%d bpl:%d\n",
+                        //        max_bpl, min_bpl, dma->align, plane_fmt[0].bytesperline);
 
 			if (info->num_planes == 1) {
 				/* Single plane formats */
@@ -864,6 +866,8 @@ __xvip_dma_try_format(struct xvip_dma *dma,
 						dma->align);
 				plane_fmt[i].bytesperline =
 						clamp(bpl, min_bpl, max_bpl);
+                                //pr_warn("xdma %d: mxbpl:%d mnbpl:%d align:%d bpl:%d\n",
+                                //        i, max_bpl, min_bpl, dma->align, plane_fmt[i].bytesperline);
 				plane_fmt[i].sizeimage =
 						plane_fmt[i].bytesperline *
 						plane_height;
@@ -888,6 +892,8 @@ __xvip_dma_try_format(struct xvip_dma *dma,
 		max_bpl = rounddown(XVIP_DMA_MAX_WIDTH, dma->align);
 		bpl = rounddown(pix->bytesperline, dma->align);
 		pix->bytesperline = clamp(bpl, min_bpl, max_bpl);
+                //pr_warn("xdma pix: mxbpl:%d mnbpl:%d align:%d bpl:%d\n",
+                //        max_bpl, min_bpl, dma->align, pix->bytesperline);
 		pix->sizeimage = pix->width * pix->height * info->bpp / 8;
 	}
 

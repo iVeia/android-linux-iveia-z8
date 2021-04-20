@@ -126,6 +126,13 @@ config VIDEO_IVEIA_BASLER
 	---help---
 	Driver for Basler MIPI cameras
 
+config VIDEO_IVEIA_PASSTHROUGH
+	tristate "iVeia v4l2 passthrough driver"
+	depends on VIDEO_XILINX
+	---help---
+	Passthrough driver for iVeia IP.  Currently just allows one to set
+        different input and output formats to keep the links valid
+
 config U_DMA_BUF
 	tristate "User space mappable DMA Buffer"
 	default m
