@@ -1,8 +1,8 @@
 /*
-* dts file for iVeia Atlas-II-Z8
+* dts file for iVeia Atlas helios module
 *
 *
-* Patrick Cleary <pcleary@iveia.com>
+* Maxwell Walter <mwalter@iveia.com>
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as
@@ -336,7 +336,7 @@
 				xlnx,video-width = <0x8>;
                                 
 				mipi0_mipi_out: endpoint {
-					remote-endpoint = <&mipi0_vcap_in>;
+					remote-endpoint = <&mipi0_scaler_in>;
 				};
 			};
 			mipi0_port1: port@1 {
@@ -353,6 +353,41 @@
 		};
         };
 
+	iveia_scaler {
+		compatible = "iveia,passthrough";
+		#address-cells = <0x01>;
+		#size-cells = <0x00>;
+		clocks = <0x34>;
+		reset-gpios = <0x32 0x51 0x01>;
+		reg = <0x00 0xa0030000 0x00 0x10000>;
+                
+		ports {
+			#address-cells = <0x01>;
+			#size-cells = <0x00>;
+                        
+			port@0 {
+				reg = <0x00>;
+				xlnx,video-format = <0x00>;
+				xlnx,video-width = <0x08>;
+                                
+				mipi0_scaler_out:endpoint {
+					remote-endpoint = <&mipi0_vcap_in>;
+				};
+			};
+                        
+			port@1 {
+				reg = <0x01>;
+				xlnx,video-format = <0x00>;
+				xlnx,video-width = <0x08>;
+                                
+				mipi0_scaler_in:endpoint {
+					remote-endpoint = <&mipi0_mipi_out>;
+					phandle = <0x43>;
+				};
+			};
+		};
+	};
+
 	mipi0_vcap {
 		compatible = "xlnx,video";
 		dma-names = "port0";
@@ -367,7 +402,7 @@
 				reg = <0x0>;
 
 				mipi0_vcap_in: endpoint {
-					remote-endpoint = <&mipi0_mipi_out>;
+					remote-endpoint = <&mipi0_scaler_out>;
 				};
 			};
 		};
@@ -585,13 +620,6 @@
 		reg = <0x48>;	
 	};
 
-	iv_io_00125_wm8960: iv_io_00125_wm8960@1a {//Atlas-I-Z8 on Bone-Island Carrier
-		compatible = "wlf,wm8960";
-		//#address-cells = <1>;
-		//#size-cells = <0>;
-		reg = <0x1a>;
-	};
-
         camera_switch@70 {
                 compatible = "nxp,pca9543";
                 #address-cells = <1>;
@@ -624,7 +652,8 @@
                         };
                         
                 };
-                
+
+                /*
                 camera_switch_70@1 {
                         #address-cells = <1>;
                         #size-cells = <0>;
@@ -648,6 +677,7 @@
                                 };
                         };
                 };
+                */
         }; // end switch@70                        
 }; // end i2c0
 
@@ -675,6 +705,14 @@
 	        interrupt-parent = <&gic>;
 	        interrupts = <0 94 4>;
         };
+
+        iv_io_00125_wm8960: iv_io_00125_wm8960@1a {//Atlas-I-Z8 on Bone-Island Carrier
+		compatible = "wlf,wm8960";
+		//#address-cells = <1>;
+		//#size-cells = <0>;
+		reg = <0x1a>;
+	};
+
 
 };
 
@@ -759,6 +797,8 @@
 
 &uart1 {
 	status = "okay";
+        compatible = "iveia,xuartps-rs485";
+	gpios = <&gpio 26 GPIO_ACTIVE_HIGH>;
 };
 
 &xilinx_ams {

@@ -1,0 +1,244 @@
+3,4d2
+<  * Modified by iVeia to support the setting of a data enable line
+<  *  to support RS485 operation
+8d5
+<  *
+15,16c12,14
+<  * This driver is based on the Xilinx PS UART driver but includes DE controls for RS485. 
+<  *
+---
+>  * This driver has originally been pushed by Xilinx using a Zynq-branding. This
+>  * still shows in the naming of this file, the kconfig symbols and some symbols
+>  * in the code.
+30,31d27
+< #include <linux/gpio.h>
+< #include <linux/of_gpio.h>
+36,38d31
+< #include <linux/delay.h>
+< #include <linux/workqueue.h>
+< #include <linux/kthread.h>
+42,43c35,36
+< #define CDNS_UART_TTY_NAME	"ttyRS"
+< #define CDNS_UART_NAME		"xuartps485"
+---
+> #define CDNS_UART_TTY_NAME	"ttyPS"
+> #define CDNS_UART_NAME		"xuartps"
+52c45
+< module_param(rx_trigger_level, uint, 0x444);
+---
+> module_param(rx_trigger_level, uint, 0444);
+57c50
+< module_param(rx_timeout, uint, 0x444);
+---
+> module_param(rx_timeout, uint, 0444);
+195a189
+>  * @quirks:		Flags for RXBS support.
+204,207d197
+< 	int			readen;
+< 	int			writeen;
+< 	wait_queue_head_t	de_waitqueue;
+< 	struct task_struct	*de_kthread;
+213c203
+< 		clk_rate_change_nb);
+---
+> 		clk_rate_change_nb)
+320d309
+< 	struct cdns_uart *dat = (struct cdns_uart *)port->private_data;
+326,328d314
+< 
+< 		gpio_set_value(dat->writeen,1);	
+< 
+330c316,317
+< 		       !(readl(port->membase + CDNS_UART_SR) & CDNS_UART_SR_TXFULL)) {
+---
+> 		       !(readl(port->membase + CDNS_UART_SR) &
+> 						CDNS_UART_SR_TXFULL)) {
+357,385d343
+< 
+< }
+< 
+< static int rs485_de_clear(void *work)
+< {  
+<   struct cdns_uart *dat = work;
+<   
+<   //struct sched_param param = { .sched_priority = prio };
+<   //sched_setscheduler(current, SCHED_FIFO, &param);
+< 
+<   __set_current_state(TASK_RUNNING);
+< 
+<   while(!kthread_should_stop()) {
+<     dev_info(dat->port->dev, "Clearing de\n");
+<     gpio_set_value(dat->writeen, 0);
+< 
+<     // Wait on either the wait queue, or the should_stop condition
+<     dev_info(dat->port->dev, "Waiting...\n");
+<     wait_event_interruptible(dat->de_waitqueue,
+<                              kthread_should_stop());
+<     dev_info(dat->port->dev, "Woke up\n");
+<     if(kthread_should_stop()) break;
+<     
+<     // After waking up, wait for 1ms, then go back to set the DE line low
+<     dev_info(dat->port->dev, "Sleeping...\n");
+<     udelay(1000);
+<   }
+< 
+<   return 0;
+399,400d356
+< 	struct cdns_uart *dat = (struct cdns_uart *)port->private_data;
+< 	
+418,421d373
+< 
+<         dev_info(port->dev, "de clear wakeup\n");
+<         //wake_up_interruptible(&dat->de_waitqueue);
+< 
+627d578
+< 
+1060c1011,1012
+< 	val &= ~(CDNS_UART_MODEMCR_RTS | CDNS_UART_MODEMCR_DTR);
+---
+> 	val &= ~(CDNS_UART_MODEMCR_RTS | CDNS_UART_MODEMCR_DTR |
+> 		 CDNS_UART_MODEMCR_FCM);
+1063,1066c1015,1016
+< 	if (mctrl & TIOCM_RTS)
+< 		val |= CDNS_UART_MODEMCR_RTS;
+< 	if (mctrl & TIOCM_DTR)
+< 		val |= CDNS_UART_MODEMCR_DTR;
+---
+> 	if (mctrl & TIOCM_RTS || mctrl & TIOCM_DTR)
+> 		val |= CDNS_UART_MODEMCR_FCM;
+1113,1114d1062
+< 
+< 	return;
+1216c1164
+< static void __init cdns_early_write(struct console *con, const char *s,
+---
+> static void cdns_early_write(struct console *con, const char *s,
+1364,1374c1312
+< 	struct tty_struct *tty;
+< 	struct device *tty_dev;
+< 	int may_wake = 0;
+< 
+< 	/* Get the tty which could be NULL so don't assume it's valid */
+< 	tty = tty_port_tty_get(&port->state->port);
+< 	if (tty) {
+< 		tty_dev = tty->dev;
+< 		may_wake = device_may_wakeup(tty_dev);
+< 		tty_kref_put(tty);
+< 	}
+---
+> 	int may_wake;
+1376,1381c1314,1316
+< 	/*
+< 	 * Call the API provided in serial_core.c file which handles
+< 	 * the suspend.
+< 	 */
+< 	uart_suspend_port(&cdns_uart_uart_driver, port);
+< 	if (!(console_suspend_enabled && !may_wake)) {
+---
+> 	may_wake = device_may_wakeup(device);
+> 
+> 	if (console_suspend_enabled && may_wake) {
+1396c1331,1335
+< 	return 0;
+---
+> 	/*
+> 	 * Call the API provided in serial_core.c file which handles
+> 	 * the suspend.
+> 	 */
+> 	return uart_suspend_port(&cdns_uart_uart_driver, port);
+1410,1420c1349,1351
+< 	struct tty_struct *tty;
+< 	struct device *tty_dev;
+< 	int may_wake = 0;
+< 
+< 	/* Get the tty which could be NULL so don't assume it's valid */
+< 	tty = tty_port_tty_get(&port->state->port);
+< 	if (tty) {
+< 		tty_dev = tty->dev;
+< 		may_wake = device_may_wakeup(tty_dev);
+< 		tty_kref_put(tty);
+< 	}
+---
+> 	int may_wake;
+> 
+> 	may_wake = device_may_wakeup(device);
+1494c1425,1428
+< 	{ .compatible = "iveia,xuartps-rs485", },
+---
+> 	{ .compatible = "xlnx,xuartps", },
+> 	{ .compatible = "cdns,uart-r1p8", },
+> 	{ .compatible = "cdns,uart-r1p12", .data = &zynqmp_uart_def },
+> 	{ .compatible = "xlnx,zynqmp-uart", .data = &zynqmp_uart_def },
+1507c1441
+< 	int rc, id, irq, ret;
+---
+> 	int rc, id, irq;
+1558,1598d1491
+<         dev_info(&pdev->dev, "Looking for pins\n");
+<         
+< 	//cdns_uart_data->readen = of_get_named_gpio(pdev->dev.of_node, "rgpio", 0);
+< 	//if ((cdns_uart_data->readen < 0) && (cdns_uart_data->readen != -ENOENT)) {
+<         //  dev_err(&pdev->dev, "Failed to get rgpio pin\n");
+< 	//	return ERR_PTR(cdns_uart_data->readen);
+<         //}
+< 
+< 	cdns_uart_data->writeen = of_get_named_gpio(pdev->dev.of_node, "wgpio", 0);
+< 	if ((cdns_uart_data->writeen < 0) && (cdns_uart_data->writeen != -ENOENT)) {
+<           dev_err(&pdev->dev, "Failed to get wgpio pin\n");
+<           return ERR_PTR(cdns_uart_data->writeen);
+<         }
+< 
+< 	//ret = gpio_request_one(cdns_uart_data->readen,
+< 	//	GPIOF_DIR_OUT,
+< 	//	"rs485_ren");
+< 	//if (ret) {
+<         //  dev_err(&pdev->dev, "Failed to request readen gpio\n");
+<         //  return ret;
+<         //}
+< 
+< 	ret = gpio_request_one(cdns_uart_data->writeen,
+< 		GPIOF_DIR_OUT,
+< 		"rs485_de");
+< 	if (ret) {
+<           dev_err(&pdev->dev, "Failed to request writeen gpio\n");
+<           return ret;
+<         }
+< 
+<         dev_info(&pdev->dev, "Got the write enable pin\n");
+< 
+<         //init_waitqueue_head(&cdns_uart_data->de_waitqueue);
+<         //cdns_uart_data->de_kthread = kthread_create(rs485_de_clear, cdns_uart_data, "ttyPSde");
+<         //if(IS_ERR(cdns_uart_data->de_kthread)) {
+<         //  rc = PTR_ERR(cdns_uart_data->de_kthread);
+<         //  dev_err(&pdev->dev, "Could not create kthread (%d)\n", rc);
+<         //  goto err_out_clk_disable;
+<         //}
+<         //wake_up_process(cdns_uart_data->de_kthread);
+<           
+1602c1495
+< 		goto err_out_stop_thread;
+---
+> 		goto err_out_clk_disable;
+1608c1501
+< 		goto err_out_stop_thread;
+---
+> 		goto err_out_clk_disable;
+1668,1669d1560
+<  err_out_stop_thread:
+<         //kthread_stop(cdns_uart_data->de_kthread);
+1699d1589
+<         //kthread_stop(cdns_uart_data->de_kthread);
+1702c1592
+< 	pm_runtime_dont_use_autosuspend(&pdev->dev);        
+---
+> 	pm_runtime_dont_use_autosuspend(&pdev->dev);
+1742c1632
+< module_init(cdns_uart_init);
+---
+> arch_initcall(cdns_uart_init);
+1745,1746c1635,1636
+< MODULE_DESCRIPTION("Driver for Cadence UART modified for RS485 support");
+< MODULE_AUTHOR("iVeia (mwalter@iveia.com)");
+---
+> MODULE_DESCRIPTION("Driver for Cadence UART");
+> MODULE_AUTHOR("Xilinx Inc.");

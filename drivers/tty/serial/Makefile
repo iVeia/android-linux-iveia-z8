@@ -79,6 +79,7 @@ obj-$(CONFIG_SERIAL_PCH_UART)	+= pch_uart.o
 obj-$(CONFIG_SERIAL_MXS_AUART) += mxs-auart.o
 obj-$(CONFIG_SERIAL_LANTIQ)	+= lantiq.o
 obj-$(CONFIG_SERIAL_XILINX_PS_UART) += xilinx_uartps.o
+obj-$(CONFIG_SERIAL_XILINX_PS_UART_RS485) += xilinx_uartps_rs485.o
 obj-$(CONFIG_SERIAL_INTREPID_RS485) += intrepid_485.o
 obj-$(CONFIG_SERIAL_SIRFSOC) += sirfsoc_uart.o
 obj-$(CONFIG_SERIAL_TEGRA) += serial-tegra.o

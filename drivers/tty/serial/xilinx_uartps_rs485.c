@@ -9,8 +9,9 @@
  * either version 2 of the License, or (at your option) any
  * later version.
  *
- * This driver is based on the Xilinx PS UART driver but includes modem controls for RS485. 
- *
+ * This driver has originally been pushed by Xilinx using a Zynq-branding. This
+ * still shows in the naming of this file, the kconfig symbols and some symbols
+ * in the code.
  */
 
 #if defined(CONFIG_SERIAL_XILINX_PS_UART_CONSOLE) && defined(CONFIG_MAGIC_SYSRQ)
@@ -24,19 +25,21 @@
 #include <linux/slab.h>
 #include <linux/tty.h>
 #include <linux/tty_flip.h>
-#include <linux/gpio.h>
-#include <linux/of_gpio.h>
 #include <linux/clk.h>
 #include <linux/irq.h>
 #include <linux/io.h>
 #include <linux/of.h>
+#include <linux/of_platform.h>
+#include <linux/gpio/consumer.h>
+#include <linux/module.h>
 #include <linux/delay.h>
 #include <linux/workqueue.h>
-#include <linux/module.h>
+#include <linux/kthread.h>
 #include <linux/pm_runtime.h>
+#include <uapi/linux/sched/types.h>
 
-#define CDNS_UART_TTY_NAME	"ttyRS"
-#define CDNS_UART_NAME		"intrepid485"
+#define CDNS_UART_TTY_NAME	"ttyPS"
+#define CDNS_UART_NAME		"xuartrs"
 #define CDNS_UART_MAJOR		0	/* use dynamic node allocation */
 #define CDNS_UART_MINOR		0	/* works best with devtmpfs */
 #define CDNS_UART_NR_PORTS	CONFIG_SERIAL_XILINX_NR_UARTS
@@ -45,12 +48,12 @@
 
 /* Rx Trigger level */
 static int rx_trigger_level = 56;
-module_param(rx_trigger_level, uint, S_IRUGO);
+module_param(rx_trigger_level, uint, 0444);
 MODULE_PARM_DESC(rx_trigger_level, "Rx trigger level, 1-63 bytes");
 
 /* Rx Timeout */
 static int rx_timeout = 10;
-module_param(rx_timeout, uint, S_IRUGO);
+module_param(rx_timeout, uint, 0444);
 MODULE_PARM_DESC(rx_timeout, "Rx timeout, 1-255");
 
 /* Register offsets for the UART. */
@@ -189,6 +192,7 @@ MODULE_PARM_DESC(rx_timeout, "Rx timeout, 1-255");
  * @pclk:		APB clock
  * @baud:		Current baud rate
  * @clk_rate_change_nb:	Notifier block for clock changes
+ * @quirks:		Flags for RXBS support.
  */
 struct cdns_uart {
 	struct uart_port	*port;
@@ -197,15 +201,16 @@ struct cdns_uart {
 	unsigned int		baud;
 	struct notifier_block	clk_rate_change_nb;
 	u32			quirks;
-	int			readen;
-	int			writeen;
-	struct work_struct	modem_sig_wq;
+        struct gpio_desc        *de_gpio;
+        struct task_struct      *de_kthread;
+        wait_queue_head_t       de_waitqueue;
+        atomic_t                de_clear;
 };
 struct cdns_platform_data {
 	u32 quirks;
 };
 #define to_cdns_uart(_nb) container_of(_nb, struct cdns_uart, \
-		clk_rate_change_nb);
+		clk_rate_change_nb)
 
 /**
  * cdns_uart_handle_rx - Handle the received bytes along with Rx errors.
@@ -319,10 +324,12 @@ static void cdns_uart_handle_tx(void *dev_id)
 	} else {
 		numbytes = port->fifosize;
 
-		gpio_set_value(dat->writeen,1);	
-
+                dev_info(port->dev, "Setting de\n");
+                gpiod_set_value(dat->de_gpio, 1);
+                
 		while (numbytes && !uart_circ_empty(&port->state->xmit) &&
-		       !(readl(port->membase + CDNS_UART_SR) & CDNS_UART_SR_TXFULL)) {
+		       !(readl(port->membase + CDNS_UART_SR) &
+						CDNS_UART_SR_TXFULL)) {
 			/*
 			 * Get the data from the UART circular buffer
 			 * and write it to the cdns_uart's TX_FIFO
@@ -349,15 +356,29 @@ static void cdns_uart_handle_tx(void *dev_id)
 				&port->state->xmit) < WAKEUP_CHARS)
 			uart_write_wakeup(port);
 	}
-
 }
 
-static void modem_sig_clear(struct work_struct *work)
-{
-	struct cdns_uart *dat = container_of(work, struct cdns_uart, modem_sig_wq);
-	msleep(1);
-	gpio_set_value(dat->writeen,0);
+static int rs485_de_clear(void *work)
+{  
+  struct cdns_uart *dat = work;
+  
+  __set_current_state(TASK_RUNNING);
 
+  while(!kthread_should_stop()) {
+    gpiod_set_value(dat->de_gpio, 0);
+
+    // Wait on either the wait queue, or the should_stop condition
+    atomic_set(&dat->de_clear, 0);
+    dev_info(dat->port->dev, "Waiting...\n");
+    wait_event_interruptible(dat->de_waitqueue,
+                             atomic_read(&dat->de_clear) || kthread_should_stop());
+    if(kthread_should_stop()) break;
+    
+    // After waking up, wait for 1ms, then go back to set the DE line low
+    udelay(500);
+  }
+
+  return 0;
 }
 
 /**
@@ -372,7 +393,6 @@ static irqreturn_t cdns_uart_isr(int irq, void *dev_id)
 	struct uart_port *port = (struct uart_port *)dev_id;
 	unsigned int isrstatus;
 	struct cdns_uart *dat = (struct cdns_uart *)port->private_data;
-	
 
 	spin_lock(&port->lock);
 
@@ -390,9 +410,11 @@ static irqreturn_t cdns_uart_isr(int irq, void *dev_id)
 		cdns_uart_handle_rx(dev_id, isrstatus);
 
 	spin_unlock(&port->lock);
-	schedule_work(&dat->modem_sig_wq);
 
-	return IRQ_HANDLED;
+        atomic_set(&dat->de_clear, 1);
+        wake_up_interruptible(&dat->de_waitqueue);
+
+        return IRQ_HANDLED;
 }
 
 /**
@@ -596,7 +618,6 @@ static void cdns_uart_start_tx(struct uart_port *port)
 
 	if (uart_tx_stopped(port))
 		return;
-
 
 	/*
 	 * Set the TX enable bit and clear the TX disable bit to enable the
@@ -1030,13 +1051,12 @@ static void cdns_uart_set_mctrl(struct uart_port *port, unsigned int mctrl)
 	val = readl(port->membase + CDNS_UART_MODEMCR);
 	mode_reg = readl(port->membase + CDNS_UART_MR);
 
-	val &= ~(CDNS_UART_MODEMCR_RTS | CDNS_UART_MODEMCR_DTR);
+	val &= ~(CDNS_UART_MODEMCR_RTS | CDNS_UART_MODEMCR_DTR |
+		 CDNS_UART_MODEMCR_FCM);
 	mode_reg &= ~CDNS_UART_MR_CHMODE_MASK;
 
-	if (mctrl & TIOCM_RTS)
-		val |= CDNS_UART_MODEMCR_RTS;
-	if (mctrl & TIOCM_DTR)
-		val |= CDNS_UART_MODEMCR_DTR;
+	if (mctrl & TIOCM_RTS || mctrl & TIOCM_DTR)
+		val |= CDNS_UART_MODEMCR_FCM;
 	if (mctrl & TIOCM_LOOP)
 		mode_reg |= CDNS_UART_MR_CHMODE_L_LOOP;
 	else
@@ -1083,8 +1103,6 @@ static void cdns_uart_poll_put_char(struct uart_port *port, unsigned char c)
 		cpu_relax();
 
 	spin_unlock_irqrestore(&port->lock, flags);
-
-	return;
 }
 #endif
 
@@ -1186,7 +1204,7 @@ static void cdns_uart_console_putchar(struct uart_port *port, int ch)
 	writel(ch, port->membase + CDNS_UART_FIFO);
 }
 
-static void __init cdns_early_write(struct console *con, const char *s,
+static void cdns_early_write(struct console *con, const char *s,
 				    unsigned n)
 {
 	struct earlycon_device *dev = con->data;
@@ -1334,24 +1352,11 @@ static struct uart_driver cdns_uart_uart_driver = {
 static int cdns_uart_suspend(struct device *device)
 {
 	struct uart_port *port = dev_get_drvdata(device);
-	struct tty_struct *tty;
-	struct device *tty_dev;
-	int may_wake = 0;
+	int may_wake;
 
-	/* Get the tty which could be NULL so don't assume it's valid */
-	tty = tty_port_tty_get(&port->state->port);
-	if (tty) {
-		tty_dev = tty->dev;
-		may_wake = device_may_wakeup(tty_dev);
-		tty_kref_put(tty);
-	}
+	may_wake = device_may_wakeup(device);
 
-	/*
-	 * Call the API provided in serial_core.c file which handles
-	 * the suspend.
-	 */
-	uart_suspend_port(&cdns_uart_uart_driver, port);
-	if (!(console_suspend_enabled && !may_wake)) {
+	if (console_suspend_enabled && may_wake) {
 		unsigned long flags = 0;
 
 		spin_lock_irqsave(&port->lock, flags);
@@ -1366,7 +1371,11 @@ static int cdns_uart_suspend(struct device *device)
 		spin_unlock_irqrestore(&port->lock, flags);
 	}
 
-	return 0;
+	/*
+	 * Call the API provided in serial_core.c file which handles
+	 * the suspend.
+	 */
+	return uart_suspend_port(&cdns_uart_uart_driver, port);
 }
 
 /**
@@ -1380,17 +1389,9 @@ static int cdns_uart_resume(struct device *device)
 	struct uart_port *port = dev_get_drvdata(device);
 	unsigned long flags = 0;
 	u32 ctrl_reg;
-	struct tty_struct *tty;
-	struct device *tty_dev;
-	int may_wake = 0;
+	int may_wake;
 
-	/* Get the tty which could be NULL so don't assume it's valid */
-	tty = tty_port_tty_get(&port->state->port);
-	if (tty) {
-		tty_dev = tty->dev;
-		may_wake = device_may_wakeup(tty_dev);
-		tty_kref_put(tty);
-	}
+	may_wake = device_may_wakeup(device);
 
 	if (console_suspend_enabled && !may_wake) {
 		struct cdns_uart *cdns_uart = port->private_data;
@@ -1464,7 +1465,7 @@ static const struct cdns_platform_data zynqmp_uart_def = {
 
 /* Match table for of_platform binding */
 static const struct of_device_id cdns_uart_of_match[] = {
-	{ .compatible = "iveia,intrepid-rs485", },
+	{ .compatible = "iveia,xuartps-rs485", },
 	{}
 };
 MODULE_DEVICE_TABLE(of, cdns_uart_of_match);
@@ -1477,11 +1478,12 @@ MODULE_DEVICE_TABLE(of, cdns_uart_of_match);
  */
 static int cdns_uart_probe(struct platform_device *pdev)
 {
-	int rc, id, irq, ret;
+	int rc, id, irq;
 	struct uart_port *port;
 	struct resource *res;
 	struct cdns_uart *cdns_uart_data;
 	const struct of_device_id *match;
+        struct sched_param sched_param = { .sched_priority = (MAX_RT_PRIO * .9) };
 
 	cdns_uart_data = devm_kzalloc(&pdev->dev, sizeof(*cdns_uart_data),
 			GFP_KERNEL);
@@ -1528,29 +1530,6 @@ static int cdns_uart_probe(struct platform_device *pdev)
 		goto err_out_clk_dis_pclk;
 	}
 
-	cdns_uart_data->readen = of_get_named_gpio(pdev->dev.of_node, "rgpio", 0);
-	if ((cdns_uart_data->readen < 0) && (cdns_uart_data->readen != -ENOENT))
-		return ERR_PTR(cdns_uart_data->readen);
-
-	cdns_uart_data->writeen = of_get_named_gpio(pdev->dev.of_node, "wgpio", 0);
-	if ((cdns_uart_data->writeen < 0) && (cdns_uart_data->writeen != -ENOENT))
-		return ERR_PTR(cdns_uart_data->writeen);
-
-	ret = gpio_request_one(cdns_uart_data->readen,
-		GPIOF_DIR_OUT,
-		"rs485_ren");
-	if (ret)
-		return ret;
-
-	ret = gpio_request_one(cdns_uart_data->writeen,
-		GPIOF_DIR_OUT,
-		"rs485_de");
-	if (ret)
-		return ret;
-	
-	INIT_WORK(&cdns_uart_data->modem_sig_wq, modem_sig_clear);
-	
-
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	if (!res) {
 		rc = -ENODEV;
@@ -1562,6 +1541,15 @@ static int cdns_uart_probe(struct platform_device *pdev)
 		rc = -ENXIO;
 		goto err_out_clk_disable;
 	}
+
+        dev_info(&pdev->dev, "Looking for pins\n");
+	cdns_uart_data->de_gpio = devm_gpiod_get(&pdev->dev, NULL, GPIOD_OUT_LOW);
+        if(IS_ERR(cdns_uart_data->de_gpio)) {
+          dev_err(&pdev->dev, "Could not get GPIO\n");
+          return PTR_ERR(cdns_uart_data->de_gpio);
+        }
+        dev_info(&pdev->dev, "Got the write enable pin\n");
+        gpiod_set_value(cdns_uart_data->de_gpio, 0);
 
 #ifdef CONFIG_COMMON_CLK
 	cdns_uart_data->clk_rate_change_nb.notifier_call =
@@ -1608,6 +1596,19 @@ static int cdns_uart_probe(struct platform_device *pdev)
 			"uart_add_one_port() failed; err=%i\n", rc);
 		goto err_out_pm_disable;
 	}
+
+        atomic_set(&cdns_uart_data->de_clear, 0);
+        init_waitqueue_head(&cdns_uart_data->de_waitqueue);
+        cdns_uart_data->de_kthread = kthread_run(rs485_de_clear, cdns_uart_data, "ttypsde");
+        if(IS_ERR(cdns_uart_data->de_kthread)) {
+          dev_err(&pdev->dev, "Failed to create task\n");
+          goto err_out_pm_disable;
+        }
+        dev_info(&pdev->dev, "Created task\n");
+
+        // Use an RT scheduler for higher priority
+        dev_info(&pdev->dev, "Setting sched priority to %d of %d\n", sched_param.sched_priority, MAX_RT_PRIO);
+        sched_setscheduler(cdns_uart_data->de_kthread, SCHED_FIFO, &sched_param);
 
 	return 0;
 
@@ -1691,9 +1692,9 @@ static void __exit cdns_uart_exit(void)
 	uart_unregister_driver(&cdns_uart_uart_driver);
 }
 
-module_init(cdns_uart_init);
+arch_initcall(cdns_uart_init);
 module_exit(cdns_uart_exit);
 
-MODULE_DESCRIPTION("Driver for Cadence UART");
+MODULE_DESCRIPTION("Driver for Cadence UART DE");
 MODULE_AUTHOR("Xilinx Inc.");
 MODULE_LICENSE("GPL");
