@@ -32,10 +32,10 @@ struct ivpass_info {
   struct device *dev;
   struct v4l2_subdev subdev;
   
-  // Currently one in / two out
-  struct media_pad pads[3];
+  // Currently one in / one out
+  struct media_pad pads[2];
 
-  struct v4l2_mbus_framefmt formats[3];
+  struct v4l2_mbus_framefmt formats[2];
   struct v4l2_mbus_framefmt default_format;
 
   bool streaming;
@@ -185,7 +185,7 @@ static int ivpass_open(struct v4l2_subdev *subdev, struct v4l2_subdev_fh *fh) {
   
   format = v4l2_subdev_get_try_format(subdev, fh->pad, 1);
   *format = info->default_format;
-
+  
   return 0;
 }
 static int ivpass_close(struct v4l2_subdev *subdev, struct v4l2_subdev_fh *fh) {
@@ -222,10 +222,8 @@ static int ivpass_probe(struct platform_device *pdev) {
   // Currently, pad0 is input, pad1 though padN is output
   info->pads[0].flags = MEDIA_PAD_FL_SOURCE;
   info->formats[0] = info->default_format;
-  info->pads[1].flags = MEDIA_PAD_FL_SOURCE;
+  info->pads[1].flags = MEDIA_PAD_FL_SINK;
   info->formats[1] = info->default_format;
-  info->pads[2].flags = MEDIA_PAD_FL_SINK;
-  info->formats[2] = info->default_format;
 
   subdev = &info->subdev;
   v4l2_subdev_init(subdev, &ivpass_ops);
@@ -236,7 +234,7 @@ static int ivpass_probe(struct platform_device *pdev) {
   subdev->flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
   subdev->entity.ops = &ivpass_media_ops;
 
-  ret = media_entity_pads_init(&subdev->entity, 3, info->pads);
+  ret = media_entity_pads_init(&subdev->entity, 2, info->pads);
   if (ret < 0) {
     dev_dbg(&pdev->dev, "Failed to init media pads\n");
     goto error;
