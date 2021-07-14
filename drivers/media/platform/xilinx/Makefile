@@ -19,4 +19,5 @@ obj-$(CONFIG_VIDEO_XILINX_CSI2RXSS) += xilinx-csi2rxss.o
 obj-$(CONFIG_VIDEO_XILINX_DUMMY) += xilinx-dummy.o
 obj-$(CONFIG_VIDEO_IVEIA_BASLER) += iveia-basler.o
 obj-$(CONFIG_VIDEO_IVEIA_PASSTHROUGH) += iveia-passthrough.o
+obj-$(CONFIG_VIDEO_IVEIA_DUMMY_SOURCE) += iveia-dummy-source.o
 obj-$(CONFIG_U_DMA_BUF) += u-dma-buf.o

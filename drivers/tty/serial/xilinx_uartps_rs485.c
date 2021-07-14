@@ -324,7 +324,7 @@ static void cdns_uart_handle_tx(void *dev_id)
 	} else {
 		numbytes = port->fifosize;
 
-                dev_info(port->dev, "Setting de\n");
+                //dev_info(port->dev, "Setting de\n");
                 gpiod_set_value(dat->de_gpio, 1);
                 
 		while (numbytes && !uart_circ_empty(&port->state->xmit) &&
@@ -369,13 +369,13 @@ static int rs485_de_clear(void *work)
 
     // Wait on either the wait queue, or the should_stop condition
     atomic_set(&dat->de_clear, 0);
-    dev_info(dat->port->dev, "Waiting...\n");
+    //dev_info(dat->port->dev, "Waiting...\n");
     wait_event_interruptible(dat->de_waitqueue,
                              atomic_read(&dat->de_clear) || kthread_should_stop());
     if(kthread_should_stop()) break;
     
-    // After waking up, wait for 1ms, then go back to set the DE line low
-    udelay(500);
+    // After waking up, wait for .5ms, then go back to set the DE line low
+    //udelay(500);
   }
 
   return 0;
@@ -402,17 +402,21 @@ static irqreturn_t cdns_uart_isr(int irq, void *dev_id)
 	isrstatus = readl(port->membase + CDNS_UART_ISR);
 	writel(isrstatus, port->membase + CDNS_UART_ISR);
 
+        //printk(KERN_INFO "u: 0x%08X\n", isrstatus);
 	if (isrstatus & CDNS_UART_IXR_TXEMPTY) {
 		cdns_uart_handle_tx(dev_id);
 		isrstatus &= ~CDNS_UART_IXR_TXEMPTY;
+                udelay(500);
+                gpiod_set_value(dat->de_gpio, 0);
 	}
-	if (isrstatus & CDNS_UART_IXR_RXMASK)
+	if (isrstatus & CDNS_UART_IXR_RXMASK) {
 		cdns_uart_handle_rx(dev_id, isrstatus);
+        }
 
 	spin_unlock(&port->lock);
 
-        atomic_set(&dat->de_clear, 1);
-        wake_up_interruptible(&dat->de_waitqueue);
+        //atomic_set(&dat->de_clear, 1);
+        //wake_up_interruptible(&dat->de_waitqueue);
 
         return IRQ_HANDLED;
 }
@@ -1483,7 +1487,7 @@ static int cdns_uart_probe(struct platform_device *pdev)
 	struct resource *res;
 	struct cdns_uart *cdns_uart_data;
 	const struct of_device_id *match;
-        struct sched_param sched_param = { .sched_priority = (MAX_RT_PRIO * .9) };
+        struct sched_param sched_param = { .sched_priority = (MAX_RT_PRIO * .95) };
 
 	cdns_uart_data = devm_kzalloc(&pdev->dev, sizeof(*cdns_uart_data),
 			GFP_KERNEL);

@@ -357,9 +357,9 @@
 		compatible = "iveia,passthrough";
 		#address-cells = <0x01>;
 		#size-cells = <0x00>;
-		clocks = <0x34>;
-		reset-gpios = <0x32 0x51 0x01>;
-		reg = <0x00 0xa0030000 0x00 0x10000>;
+		//clocks = <0x34>;
+		//reset-gpios = <0x32 0x51 0x01>;
+		reg = <0x00 0xa0041000 0x00 0x10000>;
                 
 		ports {
 			#address-cells = <0x01>;
@@ -382,7 +382,6 @@
                                 
 				mipi0_scaler_in:endpoint {
 					remote-endpoint = <&mipi0_mipi_out>;
-					phandle = <0x43>;
 				};
 			};
 		};
@@ -408,29 +407,7 @@
 		};
 	};
 
-	mipi_csi2_rx_v_frmbuf_wr_1: v_frmbuf_wr@a0010000 {
-		#dma-cells = <1>;
-		clock-names = "ap_clk";
-		clocks = <&misc_clk_0>;
-		//clocks = <&zynqmp_clk 72>;
-		compatible = "xlnx,v-frmbuf-wr-2", "xlnx,axi-frmbuf-wr-v2";
-		interrupt-names = "interrupt";
-		interrupt-parent = <&gic>;
-		interrupts = <0 109 4>;
-		reg = <0x0 0xa0010000 0x0 0x10000>;
-		reset-gpios = <&gpio 81 1>;
-		xlnx,dma-addr-width = <32>;
-		xlnx,dma-align = <16>;
-		xlnx,max-width = <4208>;
-		xlnx,max-height = <3120>;
-		xlnx,pixels-per-clock = <2>;
-		xlnx,s-axi-ctrl-addr-width = <0x7>;
-		xlnx,s-axi-ctrl-data-width = <0x20>;
-		xlnx,vid-formats = "bgr888", "xbgr8888", "xrgb8888", "uyvy", "y8", "vuy888", "xvuy8888", "yuyv", "nv12", "nv16";
-		xlnx,video-width = <8>;
-	};
-
-        mipi_csi2_rx_mipi_csi2_rx_subsyst_1: mipi_csi2_rx_subsystem@a0020000 {
+        mipi_csi2_rx_mipi_csi2_rx_subsyst_1: mipi_csi2_rx_subsystem@a0010000 {
 		clock-names = "lite_aclk", "dphy_clk_200M", "video_aclk";
 		clocks = <&clk 71>, <&misc_clk_1>, <&clk 72>;
 		compatible = "xlnx,mipi-csi2-rx-subsystem-3.0";
@@ -438,7 +415,7 @@
                 status = "okay";
 		interrupt-parent = <&gic>;
 		interrupts = <0 108 4>;
-		reg = <0x0 0xa0020000 0x0 0x10000>;
+		reg = <0x0 0xa0010000 0x0 0x10000>;
 		xlnx,axis-tdata-width = <32>;
 		xlnx,cal-mode = "NONE";
 		xlnx,clk-io-swap = "false";
@@ -512,7 +489,7 @@
 				xlnx,video-width = <0x8>;
                                 
 				mipi1_mipi_out: endpoint {
-					remote-endpoint = <&mipi1_vcap_in>;
+					remote-endpoint = <&mipi1_scaler_in>;
 				};
 			};
 			mipi1_port1: port@1 {
@@ -529,12 +506,68 @@
 		};
         };
 
-	mipi1_vcap {
+	iveia1_scaler {
+		compatible = "iveia,passthrough";
+		#address-cells = <0x01>;
+		#size-cells = <0x00>;
+		//clocks = <0x34>;
+		//reset-gpios = <0x32 0x51 0x01>;
+		reg = <0x00 0xa0041200 0x00 0x10000>;
+                
+		ports {
+			#address-cells = <0x01>;
+			#size-cells = <0x00>;
+                        
+			port@0 {
+				reg = <0x00>;
+				xlnx,video-format = <0x00>;
+				xlnx,video-width = <0x08>;
+                                
+				mipi1_scaler_out:endpoint {
+					remote-endpoint = <&mipi1_vcap_in>;
+				};
+			};
+                        
+			port@1 {
+				reg = <0x01>;
+				xlnx,video-format = <0x00>;
+				xlnx,video-width = <0x08>;
+                                
+				mipi1_scaler_in:endpoint {
+					remote-endpoint = <&mipi1_mipi_out>;
+				};
+			};
+		};
+	};
+
+	mipi_csi2e_rx_v_frmbuf_wr_0: v_frmbuf_wr@a0030000 {
+		#dma-cells = <1>;
+		clock-names = "ap_clk";
+		clocks = <&misc_clk_0>;
+		//clocks = <&zynqmp_clk 72>;
+		compatible = "xlnx,v-frmbuf-wr-2", "xlnx,axi-frmbuf-wr-v2";
+		interrupt-names = "interrupt";
+		interrupt-parent = <&gic>;
+		interrupts = <0 107 4>;
+		reg = <0x0 0xa0030000 0x0 0x10000>;
+		reset-gpios = <&gpio 81 1>;
+		xlnx,dma-addr-width = <32>;
+		xlnx,dma-align = <16>;
+		xlnx,max-width = <4208>;
+		xlnx,max-height = <3120>;
+		xlnx,pixels-per-clock = <1>;
+		xlnx,s-axi-ctrl-addr-width = <0x7>;
+		xlnx,s-axi-ctrl-data-width = <0x20>;
+		xlnx,vid-formats = "bgr888", "xbgr8888", "xrgb8888", "uyvy", "y8", "vuy888", "xvuy8888", "yuyv", "nv12", "nv16";
+		xlnx,video-width = <8>;
+	};
+
+        mipi1_vcap {
 		compatible = "xlnx,video";
 		dma-names = "port0";
-		dmas = <&mipi_csi2_rx_v_frmbuf_wr_1 0x0>;
+		dmas = <&mipi_csi2e_rx_v_frmbuf_wr_0 0x0>;
 
-		mipi1_vcap_ports: ports {
+		mipi0e_vcap_ports: ports {
 			#address-cells = <0x1>;
 			#size-cells = <0x0>;
 
@@ -543,7 +576,7 @@
 				reg = <0x0>;
 
 				mipi1_vcap_in: endpoint {
-					remote-endpoint = <&mipi1_mipi_out>;
+					remote-endpoint = <&mipi1_scaler_out>;
 				};
 			};
 		};
@@ -558,13 +591,15 @@
                 compatible = "ikwzm,u-dma-buf";
                 device-name = "udmabuf0";
                 //size = <0x02800000>; // lower res camera - 4 buffers
-                size = <0x342B000>; // higher res camera - 2 buffers
+                //size = <0x342B000>; // higher res camera - 2 buffers
+                size = <0x720000>; // smaller camera scaled
         };
         udmabuf1@0x01 {
                 compatible = "ikwzm,u-dma-buf";
                 device-name = "udmabuf1";
                 //size = <0x02800000>; // lower res camera - 4 buffers
-                size = <0x342B000>; // Higher res camera - 2 buffers
+                //size = <0x342B000>; // Higher res camera - 2 buffers
+                size = <0x720000>; // smaller camera scaled
         };
 
 }; // end amba
@@ -653,12 +688,11 @@
                         
                 };
 
-                /*
                 camera_switch_70@1 {
                         #address-cells = <1>;
                         #size-cells = <0>;
                         reg = <1>;
-                        
+
                         basler_camera_mipi1: basler_camera_mipi1@36 {
                                 compatible = "iveia,basler-mipi";
                                 reg = <0x36>;
@@ -677,7 +711,6 @@
                                 };
                         };
                 };
-                */
         }; // end switch@70                        
 }; // end i2c0
 

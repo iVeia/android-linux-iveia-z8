@@ -84,10 +84,15 @@
                 wait-delay = <3000>;
         };
 
-        udmabuf@0x00 {
+        udmabuf0 {
                 compatible = "ikwzm,u-dma-buf";
                 device-name = "udmabuf0";
-                size = <0x02800000>;
+                size = <0x720000>;
+        };
+        udmabuf1 {
+                compatible = "ikwzm,u-dma-buf";
+                device-name = "udmabuf1";
+                size = <0x720000>;
         };
 
 
@@ -275,7 +280,7 @@
 			xlnx,video-width = <8>;
 		};
 
-	mipi_csi2e_rx_v_frmbuf_wr_0: v_frmbuf_wr@a0030000 {
+	mipi_csi2e_rx_v_frmbuf_wr_0: v_frmbuf_wr@a0040000 {
 		#dma-cells = <1>;
 		clock-names = "ap_clk";
 		clocks = <&misc_clk_0>;
@@ -284,7 +289,7 @@
 		interrupt-names = "interrupt";
 		interrupt-parent = <&gic>;
 		interrupts = <0 110 4>;
-		reg = <0x0 0xa0260000 0x0 0x10000>;
+		reg = <0x0 0xa0040000 0x0 0x10000>;
 		reset-gpios = <&gpio 81 1>;
 		xlnx,dma-addr-width = <32>;
 		xlnx,dma-align = <16>;
@@ -293,7 +298,7 @@
 		xlnx,pixels-per-clock = <1>;
 		xlnx,s-axi-ctrl-addr-width = <0x7>;
 		xlnx,s-axi-ctrl-data-width = <0x20>;
-		xlnx,vid-formats = "bgr888", "y8";
+		xlnx,vid-formats = "bgr888", "xbgr8888", "xrgb8888", "uyvy", "y8", "vuy888", "xvuy8888", "yuyv", "nv12", "nv16";
 		xlnx,video-width = <8>;
 	};
 
@@ -400,9 +405,9 @@
 		compatible = "iveia,passthrough";
 		#address-cells = <0x01>;
 		#size-cells = <0x00>;
-		clocks = <0x34>;
-		reset-gpios = <0x32 0x51 0x01>;
-		reg = <0x00 0xa0030000 0x00 0x10000>;
+		//clocks = <0x34>;
+		//reset-gpios = <0x32 0x51 0x01>;
+		reg = <0x00 0xa0030000 0x00 0x01000>;
                 
 		ports {
 			#address-cells = <0x01>;
@@ -419,16 +424,6 @@
 			};
                         
 			port@1 {
-				reg = <0x00>;
-				xlnx,video-format = <0x02>;
-				xlnx,video-width = <0x08>;
-                                
-				mipi0e_scaler_out:endpoint {
-					remote-endpoint = <&mipi0e_vcap_in>;
-				};
-			};
-                        
-			port@2 {
 				reg = <0x01>;
 				xlnx,video-format = <0x00>;
 				xlnx,video-width = <0x08>;
@@ -461,7 +456,31 @@
 			};
 		};
 
-        mipi0e_vcap {
+	iveia_dsource {
+		compatible = "iveia,dummy-source";
+		#address-cells = <0x01>;
+		#size-cells = <0x00>;
+		//clocks = <0x34>;
+		//reset-gpios = <0x32 0x51 0x01>;
+		reg = <0x00 0xa0031000 0x00 0x01000>;
+                
+		ports {
+			#address-cells = <0x01>;
+			#size-cells = <0x00>;
+                        
+			port@0 {
+				reg = <0x00>;
+				xlnx,video-format = <0x02>;
+				xlnx,video-width = <0x08>;
+                                
+				iveia_dsource_out:endpoint {
+					remote-endpoint = <&mipi0e_vcap_in>;
+				};
+			};                        
+		};
+	};
+
+        mipie0_vcap {
 		compatible = "xlnx,video";
 		dma-names = "port0";
 		dmas = <&mipi_csi2e_rx_v_frmbuf_wr_0 0x0>;
@@ -475,11 +494,12 @@
 				reg = <0x0>;
 
 				mipi0e_vcap_in: endpoint {
-					remote-endpoint = <&mipi0e_scaler_out>;
+					remote-endpoint = <&iveia_dsource_out>;
 				};
 			};
 		};
 	};
+        
         /*
 		mipi_csi2_rx_v_frmbuf_wr_1: v_frmbuf_wr@a0010000 {
 			#dma-cells = <1>;
@@ -842,7 +862,7 @@
                                         #address-cells = <1>;
                                         #size-cells = <0>;
                                         reg = <2>;
-
+                                        /*
                                         basler_camera_mipi1: basler_camera_mipi1@36 {
                                                 compatible = "iveia,basler-mipi";
                                                 reg = <0x36>;
@@ -860,6 +880,7 @@
                                                         };
                                                 };
                                         };
+                                        */
                                 };
                                 i2c_70@3 {
                                         #address-cells = <1>;

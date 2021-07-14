@@ -133,6 +133,13 @@ config VIDEO_IVEIA_PASSTHROUGH
 	Passthrough driver for iVeia IP.  Currently just allows one to set
         different input and output formats to keep the links valid
 
+config VIDEO_IVEIA_DUMMY_SOURCE
+	tristate "iVeia v4l2 dummy source driver"
+	depends on VIDEO_XILINX
+	---help---
+	Dummy source driver for iVeia IP.  Currently just allows one to set
+        an arbitrary input format to keep the links valid
+
 config U_DMA_BUF
 	tristate "User space mappable DMA Buffer"
 	default m

@@ -12,6 +12,8 @@
  * published by the Free Software Foundation.
  */
 
+#define DEBUT 1
+
 #include <linux/dma/xilinx_dma.h>
 #include <linux/dma/xilinx_frmbuf.h>
 #include <linux/lcm.h>
@@ -545,7 +547,7 @@ static int xvip_dma_start_streaming(struct vb2_queue *vq, unsigned int count)
 	 * Start streaming on the pipeline. No link touching an entity in the
 	 * pipeline can be activated or deactivated once streaming is started.
 	 *
-	 * Use the pipeline object embedded in the first DMA object that starts
+ 	 * Use the pipeline object embedded in the first DMA object that starts
 	 * streaming.
 	 */
 	pipe = dma->video.entity.pipe
@@ -989,6 +991,8 @@ int xvip_dma_init(struct xvip_composite_device *xdev, struct xvip_dma *dma,
 
 	dma->fmtinfo = xvip_get_format_by_fourcc(XVIP_DMA_DEF_FORMAT);
 	dma->format.type = type;
+        
+        dev_info(dma->xdev->dev, "Initing xvip DMA\n");
 
 	if (V4L2_TYPE_IS_MULTIPLANAR(type)) {
 		struct v4l2_pix_format_mplane *pix_mp;
@@ -1040,8 +1044,10 @@ int xvip_dma_init(struct xvip_composite_device *xdev, struct xvip_dma *dma,
 		dma->pad.flags = MEDIA_PAD_FL_SOURCE;
 
 	ret = media_entity_pads_init(&dma->video.entity, 1, &dma->pad);
-	if (ret < 0)
-		goto error;
+	if (ret < 0) {
+          dev_err(dma->xdev->dev, "failed to init media pads: %d\n", ret);
+          goto error;
+        }
 
 	/* ... and the video node... */
 	dma->video.fops = &xvip_dma_fops;
