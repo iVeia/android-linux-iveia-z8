@@ -406,7 +406,7 @@ static irqreturn_t cdns_uart_isr(int irq, void *dev_id)
 	if (isrstatus & CDNS_UART_IXR_TXEMPTY) {
 		cdns_uart_handle_tx(dev_id);
 		isrstatus &= ~CDNS_UART_IXR_TXEMPTY;
-                udelay(500);
+                udelay(100);
                 gpiod_set_value(dat->de_gpio, 0);
 	}
 	if (isrstatus & CDNS_UART_IXR_RXMASK) {
