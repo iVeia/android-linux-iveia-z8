@@ -602,6 +602,22 @@
                 size = <0x720000>; // smaller camera scaled
         };
 
+
+        led_pwm@0x501000000 {
+                compatible = "iveia,pl-pwm";
+		reg = <0x05 0x01000000 0x00 0x1000>;
+                status = "okay";
+                #pwm-cells = <3>;
+        };
+
+
+
+
+
+
+
+        // Now for the front camera mipi chain
+
 }; // end amba
 
 
